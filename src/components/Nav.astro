@@ -1,0 +1,109 @@
+---
+import { t } from '../i18n/ui';
+import { ruta, type Idioma } from '../i18n/routes';
+import LangSwitch from './LangSwitch.astro';
+import { APP } from '../data/app';
+
+interface Props { lang: Idioma; alternas: { es: string; en: string }; }
+const { lang, alternas } = Astro.props;
+const tr = t(lang);
+
+const enlaces = [
+  { clave: 'nav.plus', pagina: 'plus' },
+  { clave: 'nav.aprende', pagina: 'aprende' },
+  { clave: 'nav.soporte', pagina: 'soporte' },
+] as const;
+
+const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<header class="barra">
+  <div class="envoltorio interior">
+    <a class="marca" href={ruta('home', lang)}>
+      <span class="punto" aria-hidden="true"></span>
+      <span>Own Lane</span>
+    </a>
+
+    <nav aria-label={tr('nav.menu')}>
+      <ul>
+        {enlaces.map(({ clave, pagina }) => {
+          const href = ruta(pagina, lang);
+          return (
+            <li>
+              <a href={href} aria-current={actual === href ? 'page' : undefined}>{tr(clave)}</a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <div class="derecha">
+      <LangSwitch lang={lang} alternas={alternas} />
+      <a class="descarga" href={APP.appStoreUrl}>{tr('cta.appstore')}</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .barra {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--background) 84%, transparent);
+    backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 0.5px solid var(--separator);
+  }
+  .interior { display: flex; align-items: center; gap: 20px; height: 56px; }
+  .marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .punto {
+    width: 13px;
+    height: 13px;
+    border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%;
+    background: var(--tint);
+    flex: none;
+  }
+  nav { flex: 1; min-width: 0; }
+  ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; }
+  nav a {
+    font-size: 15px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  nav a:hover, nav a[aria-current='page'] { color: var(--ink); }
+  .derecha { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .descarga {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 7px 15px;
+    border-radius: 999px;
+    background: var(--tint);
+    color: var(--on-tint);
+    text-decoration: none;
+    transition: var(--press);
+    white-space: nowrap;
+  }
+  .descarga:active { transform: scale(0.965); opacity: 0.86; }
+
+  @media (max-width: 640px) {
+    ul { gap: 14px; }
+    nav a { font-size: 14px; }
+    .marca span:last-child { display: none; }
+    .descarga { padding: 7px 13px; }
+  }
+  @media (max-width: 420px) {
+    /* Nunca ocultar la navegacion: se aprieta, pero sigue alcanzable. */
+    .interior { gap: 12px; }
+    ul { gap: 11px; }
+    nav a { font-size: 13px; }
+    .derecha { gap: 7px; }
+  }
+</style>

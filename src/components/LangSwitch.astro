@@ -1,0 +1,29 @@
+---
+import { t } from '../i18n/ui';
+import type { Idioma } from '../i18n/routes';
+
+interface Props { lang: Idioma; alternas: { es: string; en: string }; }
+const { lang, alternas } = Astro.props;
+
+const otro: Idioma = lang === 'es' ? 'en' : 'es';
+const tr = t(lang);
+---
+<a class="cambio" href={alternas[otro]} hreflang={otro} lang={otro} aria-label={tr('lang.etiqueta')}>
+  {tr('lang.otro')}
+</a>
+
+<style>
+  .cambio {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--fill-2);
+    transition: var(--press);
+    white-space: nowrap;
+  }
+  .cambio:hover { color: var(--ink); }
+  .cambio:active { transform: scale(0.965); }
+</style>

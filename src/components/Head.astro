@@ -1,0 +1,55 @@
+---
+import { APP } from '../data/app';
+import { rutas, type Idioma, type Pagina } from '../i18n/routes';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  lang: Idioma;
+  pagina?: Pagina;
+  /** Para paginas fuera del mapa (articulos): rutas ES y EN explicitas. */
+  alternas?: { es: string; en: string };
+  og?: string;
+}
+
+const { titulo, descripcion, lang, pagina, alternas, og = '/og/landing-es.png' } = Astro.props;
+
+const alt = alternas ?? (pagina ? rutas[pagina] : null);
+const canonical = new URL(Astro.url.pathname, APP.sitio).href.replace(/(.)\/$/, '$1');
+const ogAbs = new URL(og, APP.sitio).href;
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{titulo}</title>
+<meta name="description" content={descripcion} />
+<link rel="canonical" href={canonical} />
+
+{alt && (
+  <>
+    <link rel="alternate" hreflang="es" href={new URL(alt.es, APP.sitio).href.replace(/(.)\/$/, '$1')} />
+    <link rel="alternate" hreflang="en" href={new URL(alt.en, APP.sitio).href.replace(/(.)\/$/, '$1')} />
+    <link rel="alternate" hreflang="x-default" href={new URL(alt.es, APP.sitio).href.replace(/(.)\/$/, '$1')} />
+  </>
+)}
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={titulo} />
+<meta property="og:description" content={descripcion} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogAbs} />
+<meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+<meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_ES'} />
+<meta property="og:site_name" content={APP.nombre} />
+<meta name="twitter:card" content="summary_large_image" />
+
+<!-- Smart App Banner en Safari iOS -->
+<meta name="apple-itunes-app" content={`app-id=${APP.appStoreId}`} />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+<!-- Arma el estado inicial de los reveals. Sin JS, todo queda visible. -->
+<script is:inline>
+  document.documentElement.classList.add('js');
+</script>

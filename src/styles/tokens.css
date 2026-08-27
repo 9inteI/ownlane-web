@@ -1,0 +1,113 @@
+/* Portado uno a uno de OwnLane/Design/Palette.swift.
+   Regla de la app: el acento es la tinta del icono, y las manchas son SIEMPRE
+   tinta, nunca color. El unico tono no neutro es --teal, reservado a descanso
+   y privacidad. */
+
+:root {
+  /* Acento */
+  --tint: #14120f;
+  --on-tint: #ffffff;
+  --teal: #5a6b78;
+
+  /* Superficies */
+  --background: #f5f5f7;
+  --card: #ffffff;
+  --ink: #1d1d1f;
+
+  /* Texto secundario.
+     Palette.swift usa #86868B, que sobre #F5F5F7 da 3.5:1 — en la app lo salva
+     Dynamic Type, en web no cumple AA. --ink-soft se oscurece para cuerpo;
+     --ink-soft-lg conserva el valor original y solo vale para >=24px
+     o >=18.66px bold, donde AA baja a 3:1. */
+  --ink-soft: #6e6e73;
+  --ink-soft-lg: #86868b;
+
+  /* Lineas y rellenos de sistema */
+  --separator: rgba(60, 60, 67, 0.16);
+  --card-border: rgba(0, 0, 0, 0.05);
+  --hairline: rgba(60, 60, 67, 0.2);
+  --fill-1: rgba(60, 60, 67, 0.07);
+  --fill-2: rgba(60, 60, 67, 0.08);
+  --fill-3: rgba(60, 60, 67, 0.09);
+  --track: rgba(60, 60, 67, 0.1);
+  --bar: rgba(60, 60, 67, 0.14);
+  --line-1: rgba(60, 60, 67, 0.26);
+  --line-2: rgba(60, 60, 67, 0.3);
+
+  /* Washes */
+  --tint-wash: rgba(20, 18, 15, 0.09);
+  --tint-wash-soft: rgba(20, 18, 15, 0.05);
+  --teal-wash: rgba(90, 107, 120, 0.13);
+
+  /* Tinta decorativa */
+  --splash: #1d1d1f;
+  --splash-soft: #6e6e73;
+  --gloss: rgba(255, 255, 255, 0.18);
+
+  /* Bloque invertido */
+  --inverse-surface: #1d1d1f;
+  --inverse-ink: #ffffff;
+  --inverse-ink-soft: rgba(255, 255, 255, 0.82);
+
+  /* Sombra de tarjeta: en Palette.swift tiene alpha 0 en oscuro, no existe */
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --glow: 0 8px 14px rgba(20, 18, 15, 0.32);
+
+  /* Chasis */
+  --radius-card: 18px;
+  --pad-card: 20px;
+  --pill-height: 52px;
+  --ancho: 1080px;
+  --ancho-texto: 680px;
+
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Segoe UI Variable Text", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* La microinteraccion firma de la app: PressableButtonStyle,
+     spring(response: .24, dampingFraction: .7) */
+  --press: transform 0.18s cubic-bezier(0.34, 1.4, 0.5, 1), opacity 0.18s ease-out;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tint: #f5f5f7;
+    --on-tint: #0b0b0c;
+    --teal: #8fa3b0;
+
+    --background: #000000;
+    --card: #151517;
+    --ink: #f5f5f7;
+    --ink-soft: #9a9aa0;
+    --ink-soft-lg: #9a9aa0;
+
+    --separator: rgba(255, 255, 255, 0.09);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --hairline: rgba(255, 255, 255, 0.1);
+    --fill-1: rgba(255, 255, 255, 0.07);
+    --fill-2: rgba(255, 255, 255, 0.09);
+    --fill-3: rgba(255, 255, 255, 0.1);
+    --track: rgba(255, 255, 255, 0.11);
+    --bar: rgba(255, 255, 255, 0.13);
+    --line-1: rgba(255, 255, 255, 0.26);
+    --line-2: rgba(255, 255, 255, 0.3);
+
+    --tint-wash: rgba(245, 245, 247, 0.14);
+    --tint-wash-soft: rgba(245, 245, 247, 0.09);
+    --teal-wash: rgba(143, 163, 176, 0.16);
+
+    --splash: #ffffff;
+    --splash-soft: #9a9aa0;
+    --gloss: rgba(255, 255, 255, 0.12);
+
+    --inverse-surface: #f0ede6;
+    --inverse-ink: #1d1d1f;
+    --inverse-ink-soft: rgba(29, 29, 31, 0.66);
+
+    --card-shadow: none;
+    --glow: 0 8px 14px rgba(245, 245, 247, 0.22);
+  }
+}

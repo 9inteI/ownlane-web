@@ -1,0 +1,36 @@
+---
+import Head from '../components/Head.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { t } from '../i18n/ui';
+import { rutas, type Idioma, type Pagina } from '../i18n/routes';
+import '../styles/base.css';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  lang: Idioma;
+  pagina?: Pagina;
+  alternas?: { es: string; en: string };
+  og?: string;
+}
+
+const { titulo, descripcion, lang, pagina, alternas, og } = Astro.props;
+const alt = alternas ?? (pagina ? { ...rutas[pagina] } : { es: '/', en: '/en' });
+const tr = t(lang);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <Head titulo={titulo} descripcion={descripcion} lang={lang} pagina={pagina} alternas={alt} og={og} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">{tr('nav.saltar')}</a>
+    <Nav lang={lang} alternas={alt} />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

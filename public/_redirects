@@ -1,0 +1,7 @@
+# El sitio anterior eran dos HTML sueltos, y / era la pagina de SOPORTE,
+# que es la URL registrada en App Store Connect. 301 reales: los redirects
+# nativos de Astro emiten meta-refresh, no cabecera.
+/index.html        /soporte      301
+/privacidad.html   /privacidad   301
+/es                /             301
+/es/*              /:splat       301

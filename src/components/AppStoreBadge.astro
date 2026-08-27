@@ -1,0 +1,43 @@
+---
+/* Pildora propia, no el badge de Apple.
+ *
+ * Las guias de marketing de Apple exigen que el badge "Descargalo en el App
+ * Store" se use con su artwork oficial y sin modificar; recrear el logotipo a
+ * mano las incumple. Un enlace de texto con la frase si esta permitido, asi que
+ * esto es la PillButton de la app (capsula, 52, 17 semibold, glow) con el texto
+ * literal. Si mas adelante quieres el badge oficial, se descarga de Apple
+ * Marketing Resources y se sustituye este componente por la imagen tal cual.
+ */
+import { APP } from '../data/app';
+import type { Idioma } from '../i18n/routes';
+
+interface Props { lang: Idioma; variante?: 'lleno' | 'suave'; clase?: string; }
+const { lang, variante = 'lleno', clase = '' } = Astro.props;
+
+const texto = lang === 'es' ? 'Descárgalo en el App Store' : 'Download on the App Store';
+const sub = lang === 'es' ? 'Gratis · iPhone y Apple Watch' : 'Free · iPhone and Apple Watch';
+---
+<a class:list={['pildora', variante, clase]} href={APP.appStoreUrl}>
+  <span class="texto">{texto}</span>
+  <span class="sub">{sub}</span>
+</a>
+
+<style>
+  .pildora {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: var(--pill-height);
+    padding: 11px 30px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: var(--press);
+  }
+  .pildora:active { transform: scale(0.965); opacity: 0.86; }
+  .lleno { background: var(--tint); color: var(--on-tint); box-shadow: var(--glow); }
+  .suave { background: var(--fill-2); color: var(--ink); }
+  .texto { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .sub { font-size: 12px; opacity: 0.72; }
+</style>

@@ -1,0 +1,53 @@
+---
+/* Mancha decorativa. Geometria generada por scripts/gen-splats.mjs desde
+ * OwnLane/Design/InkSplash.swift. Puramente ornamental: aria-hidden. */
+const svgs = import.meta.glob<string>('./splats/*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+interface Props {
+  variante?: 1 | 2 | 3;
+  /** Opacidad. En la app las manchas van entre 0.07 y 0.17. */
+  opacidad?: number;
+  /** Tamano CSS, cualquier unidad. */
+  tam?: string;
+  suave?: boolean;
+  clase?: string;
+  estilo?: string;
+}
+
+const {
+  variante = 1,
+  opacidad = 0.1,
+  tam = '320px',
+  suave = false,
+  clase = '',
+  estilo = '',
+} = Astro.props;
+
+const bruto = svgs[`./splats/splat-${variante}.svg`];
+---
+<div
+  class:list={['mancha', clase]}
+  aria-hidden="true"
+  style={`--op:${opacidad};--tam:${tam};${estilo}`}
+  data-suave={suave ? '' : undefined}
+  set:html={bruto}
+/>
+
+<style>
+  .mancha {
+    position: absolute;
+    width: var(--tam);
+    height: var(--tam);
+    opacity: var(--op);
+    color: var(--splash);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+  .mancha[data-suave] { color: var(--splash-soft); }
+  .mancha :global(svg) { width: 100%; height: 100%; display: block; }
+</style>

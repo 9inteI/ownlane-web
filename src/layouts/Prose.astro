@@ -1,0 +1,44 @@
+---
+/* Paginas de texto: soporte, privacidad, articulos. Sin GSAP, sin efectos. */
+import Base from './Base.astro';
+import InkSplash from '../components/ink/InkSplash.astro';
+import type { Idioma, Pagina } from '../i18n/routes';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  h1: string;
+  entradilla?: string;
+  lang: Idioma;
+  pagina?: Pagina;
+  alternas?: { es: string; en: string };
+  og?: string;
+}
+
+const { titulo, descripcion, h1, entradilla, lang, pagina, alternas, og } = Astro.props;
+---
+<Base titulo={titulo} descripcion={descripcion} lang={lang} pagina={pagina} alternas={alternas} og={og}>
+  <!-- Reenvia el head al Base: sin esto el slot se pierde en silencio. -->
+  <slot name="head" slot="head" />
+  <div class="marco">
+    <InkSplash variante={2} opacidad={0.07} tam="min(420px, 62vw)" estilo="top:-90px;right:-140px" />
+    <div class="envoltorio-texto">
+      <header class="cabecera">
+        <p class="eyebrow">Own Lane</p>
+        <h1>{h1}</h1>
+        {entradilla && <p class="entradilla sutil">{entradilla}</p>}
+      </header>
+      <div class="prosa">
+        <slot />
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .marco { position: relative; overflow: clip; }
+  .cabecera { padding: 64px 0 12px; }
+  h1 { margin: 14px 0 8px; }
+  .entradilla { font-size: 19px; max-width: 54ch; }
+  .prosa { padding-bottom: 24px; }
+</style>

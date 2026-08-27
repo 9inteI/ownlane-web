@@ -1,0 +1,42 @@
+---
+interface Props { pregunta: string; abierto?: boolean; }
+const { pregunta, abierto = false } = Astro.props;
+---
+<details class="item" open={abierto}>
+  <summary>
+    <span>{pregunta}</span>
+    <svg class="cheurón" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </summary>
+  <div class="cuerpo"><slot /></div>
+</details>
+
+<style>
+  .item {
+    border-bottom: 0.5px solid var(--separator);
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .cheurón {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: var(--ink-soft);
+    transition: transform 0.2s ease-out;
+  }
+  .item[open] .cheurón { transform: rotate(180deg); }
+  .cuerpo { padding-bottom: 20px; color: var(--ink-soft); }
+  .cuerpo :global(p + p) { margin-top: 0.9em; }
+</style>

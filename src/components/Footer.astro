@@ -1,0 +1,54 @@
+---
+import { t } from '../i18n/ui';
+import { ruta, type Idioma } from '../i18n/routes';
+import { APP } from '../data/app';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const tr = t(lang);
+---
+<footer class="pie">
+  <div class="envoltorio">
+    <div class="fila">
+      <div class="marca">Own Lane</div>
+      <nav class="enlaces" aria-label={lang === 'es' ? 'Pie de página' : 'Footer'}>
+        <a href={ruta('soporte', lang)}>{tr('footer.soporte')}</a>
+        <a href={ruta('privacidad', lang)}>{tr('footer.privacidad')}</a>
+        <a href={ruta('prensa', lang)}>{tr('footer.prensa')}</a>
+        <a href={`mailto:${APP.email}`}>{APP.email}</a>
+      </nav>
+    </div>
+
+    <p class="aviso">{tr('footer.aviso')}</p>
+    <p class="nota">{tr('footer.sinAnalitica')}</p>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    margin-top: 96px;
+    padding: 34px 0 64px;
+    border-top: 0.5px solid var(--separator);
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 14px 26px;
+    margin-bottom: 22px;
+  }
+  .marca {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .enlaces { display: flex; flex-wrap: wrap; gap: 10px 22px; }
+  .enlaces a { color: var(--ink-soft); text-decoration: none; }
+  .enlaces a:hover { color: var(--ink); text-decoration: underline; }
+  .aviso { max-width: 62ch; }
+  .nota { margin-top: 10px; max-width: 62ch; opacity: 0.8; }
+</style>
