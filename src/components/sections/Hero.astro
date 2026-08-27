@@ -1,13 +1,18 @@
 ---
+/* Hero asimetrico: el titular manda a ancho completo, y el grupo de
+ * dispositivos flota por debajo y a la derecha, solapandolo.
+ *
+ * La regla de las dos lineas: el H1 va en un contenedor de 64rem a ancho
+ * completo, no dentro de una columna de rejilla. Antes caia en una columna de
+ * ~520 px y salian tres lineas en escritorio y cuatro en movil. */
 import { Image } from 'astro:assets';
 import GrupoDispositivos from '../GrupoDispositivos.astro';
 import AppStoreBadge from '../AppStoreBadge.astro';
-import InkSplash from '../ink/InkSplash.astro';
 import Splatter from '../ink/Splatter.astro';
 import CursorTrail from '../ink/CursorTrail.astro';
 import { hero } from '../../data/landing';
-import type { Idioma } from '../../i18n/routes';
 import { captura } from '../../data/capturas';
+import type { Idioma } from '../../i18n/routes';
 import logo from '../../assets/brand/ownlane-logo.png';
 
 interface Props { lang: Idioma; }
@@ -17,78 +22,149 @@ const [linea1, linea2] = c.h1.split('\n');
 
 const hoy = captura('hoy', lang);
 const plan = captura('plan', lang);
+const detalle = captura('detalle', lang);
 ---
 <section class="hero">
   <Splatter
     variante={1}
-    tam="min(660px, 84vw)"
-    opacidad={0.09}
+    tam="min(720px, 88vw)"
+    opacidad={0.085}
     brillo
     parallax={0.1}
-    estilo="top:-180px;right:-200px"
+    estilo="top:-220px;right:-240px"
   />
-  <InkSplash variante={3} opacidad={0.055} tam="min(380px, 52vw)" suave estilo="bottom:-120px;left:-150px" />
   <CursorTrail />
 
-  <div class="envoltorio malla">
-    <div class="texto">
-      <Image
-        class="logo"
-        src={logo}
-        alt=""
-        aria-hidden="true"
-        width={72}
-        densities={[1, 2]}
-        loading="eager"
-      />
+  <div class="envoltorio">
+    <div class="titular">
+      <Image class="logo" src={logo} alt="" aria-hidden="true" width={64} densities={[1, 2]} loading="eager" />
       <h1>
         <span class="linea">{linea1}</span>
-        <span class="linea acento">{linea2}</span>
+        <span class="linea baja">
+          {/* Imagen tipografica: el mapa de una salida, dentro del titular. */}
+          <span class="pastilla" aria-hidden="true">
+            <Image src={detalle.claro} alt="" width={150} densities={[1, 2]} loading="eager" />
+          </span>
+          <span>{linea2}</span>
+        </span>
       </h1>
+    </div>
+
+    <div class="pie">
       <p class="entradilla">{c.entradilla}</p>
       <div class="acciones">
         <AppStoreBadge lang={lang} />
+        <p class="nota sutil">{c.pie}</p>
       </div>
-      <p class="pie sutil">{c.pie}</p>
     </div>
+  </div>
 
-    <div class="movil">
-      <GrupoDispositivos
-        ancho={266}
-        prioritario
-        piezas={[
-          { src: hoy.claro, srcOscuro: hoy.oscuro, alt: hoy.alt },
-          { src: plan.claro, srcOscuro: plan.oscuro, alt: plan.alt },
-        ]}
-      />
-    </div>
+  <div class="flota">
+    <GrupoDispositivos
+      ancho={236}
+      prioritario
+      piezas={[
+        { src: hoy.claro, srcOscuro: hoy.oscuro, alt: hoy.alt },
+        { src: plan.claro, srcOscuro: plan.oscuro, alt: plan.alt },
+      ]}
+    />
   </div>
 </section>
 
 <style>
-  .hero { position: relative; overflow: clip; padding: 56px 0 40px; }
-  .malla {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: 48px;
-    align-items: center;
+  .hero {
+    position: relative;
+    overflow: clip;
+    padding: 40px 0 0;
+    isolation: isolate;
   }
-  .logo { width: 72px; height: 72px; border-radius: 19px; margin-bottom: 26px; }
-  h1 { display: flex; flex-direction: column; }
-  .linea { display: block; }
-  .acento { color: var(--ink-soft-lg); }
-  .entradilla {
-    margin-top: 22px;
-    font-size: clamp(17px, 2vw, 20px);
-    color: var(--ink-soft);
-    max-width: 46ch;
-  }
-  .acciones { margin-top: 30px; }
-  .pie { margin-top: 16px; font-size: 13px; }
-  .movil { justify-self: center; }
 
-  @media (max-width: 900px) {
-    .malla { grid-template-columns: 1fr; gap: 40px; }
-    .movil { --escala: 0.86; }
+  .logo { width: 64px; height: 64px; border-radius: 17px; margin-bottom: 30px; }
+
+  /* Aqui esta la correccion: 64rem a ancho completo, no una columna estrecha. */
+  /* Metrica de las dos lineas, calculada, no a ojo:
+     a 4.4rem (70 px) la linea 1 son 26 caracteres ~ 858 px y la linea 2 son
+     la pastilla (2.4em ~ 168 px) mas 21 caracteres ~ 693 px. Las dos caben en
+     los 1024 px del contenedor, asi que el H1 son DOS lineas y no tres. */
+  .titular { max-width: 64rem; }
+  h1 {
+    font-size: clamp(2.6rem, 4.6vw, 4.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+  .linea { display: block; }
+  .baja {
+    color: var(--ink-soft-lg);
+    display: flex;
+    align-items: center;
+    gap: 0.26em;
+    /* Sin wrap: si envuelve, la pastilla cae sola a una linea y se lee roto. */
+    flex-wrap: nowrap;
+  }
+  .baja > span:last-child { min-width: 0; }
+
+  /* La pastilla: un trozo de la app metido dentro del texto. */
+  .pastilla {
+    display: inline-block;
+    width: 2.4em;
+    height: 1.08em;
+    border-radius: 999px;
+    overflow: hidden;
+    flex: none;
+    box-shadow: inset 0 0 0 1px var(--card-border);
+    transform: translateY(-0.04em);
+  }
+  .pastilla :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 26%;
+    filter: contrast(1.06);
+  }
+
+  /* Una sola columna: en dos, la entradilla se queda en 380 px y sale un
+     parrafo de cuatro lineas, que es justo lo que no queremos. */
+  .pie {
+    display: grid;
+    gap: 30px;
+    justify-items: start;
+    margin-top: 40px;
+    max-width: 44rem;
+  }
+  .entradilla { font-size: clamp(17px, 1.5vw, 20px); color: var(--ink-soft); max-width: 46ch; }
+  .acciones { display: grid; justify-items: start; gap: 12px; }
+  .nota { font-size: 13px; }
+
+  /* El grupo de moviles flota a la derecha y solapa el titular por abajo.
+     Va absoluto y el texto se limita a la mitad izquierda: si se deja en flujo
+     con margen negativo, se come el boton de descarga. */
+  .flota { pointer-events: none; }
+  .flota > :global(*) { pointer-events: auto; }
+
+  @media (min-width: 981px) {
+    /* Medido, no a ojo: la linea 2 del H1 acaba en x=947 y su caja baja hasta
+       y=342. Con el grupo a 236 px de ancho (347 el conjunto) y el hero a 760,
+       el grupo baja a y 363, por debajo del titular, que acaba en 342. */
+    .hero { padding-bottom: 48px; min-height: 800px; }
+    .titular { max-width: 64rem; }
+    .pie { max-width: 40rem; }
+    /* Anclado abajo a la derecha: solapa el hueco que deja el texto, no el
+       titular ni el boton. Anclarlo por arriba lo hacia depender del alto del
+       H1 y acababa pisandolo. */
+    .flota {
+      position: absolute;
+      bottom: 0;
+      right: max(20px, calc(50% - var(--ancho) / 2));
+      z-index: -1;
+    }
+  }
+
+  @media (max-width: 980px) {
+    .pie { grid-template-columns: 1fr; gap: 26px; align-items: start; }
+    .flota { display: flex; justify-content: center; margin-top: 40px; }
+  }
+  @media (max-width: 560px) {
+    .baja { gap: 0.2em; }
+    .pastilla { width: 2.2em; }
   }
 </style>

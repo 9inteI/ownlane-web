@@ -2,25 +2,22 @@
 import Base from '../../layouts/Base.astro';
 import Hero from '../sections/Hero.astro';
 import StatBlock from '../sections/StatBlock.astro';
-import Eje from '../sections/Eje.astro';
-import Tarjetas from '../sections/Tarjetas.astro';
+import Apilado from '../sections/Apilado.astro';
+import Bento from '../sections/Bento.astro';
+import Marquee from '../sections/Marquee.astro';
+import Horizontal from '../sections/Horizontal.astro';
 import Privacy from '../sections/Privacy.astro';
 import Watch from '../sections/Watch.astro';
 import Precios from '../sections/Precios.astro';
 import Cierre from '../sections/Cierre.astro';
-import { ejes } from '../../data/landing';
+import Movimiento from '../ink/Movimiento.astro';
 import { APP } from '../../data/app';
 
-import { captura } from '../../data/capturas';
 import type { Idioma } from '../../i18n/routes';
 
 interface Props { lang: Idioma; }
 const { lang } = Astro.props;
 
-const plan = captura('plan', lang);
-const aprende = captura('aprende', lang);
-const progreso = captura('progreso', lang);
-const detalle = captura('detalle', lang);
 
 const meta = {
   es: {
@@ -63,27 +60,25 @@ const jsonld = {
   <Hero lang={lang} />
   <StatBlock lang={lang} />
 
-  <Eje bloque={ejes.sentido[lang]} mancha={2} />
-  <Eje
-    bloque={ejes.dias[lang]}
-    invertido
-    piezas={[
-      { src: plan.claro, srcOscuro: plan.oscuro, alt: plan.alt },
-      { src: aprende.claro, srcOscuro: aprende.oscuro, alt: aprende.alt },
-    ]}
-  />
-  <Eje
-    bloque={ejes.salida[lang]}
-    mancha={1}
-    piezas={[
-      { src: detalle.claro, srcOscuro: detalle.oscuro, alt: detalle.alt },
-      { src: progreso.claro, srcOscuro: progreso.oscuro, alt: progreso.alt },
-    ]}
-  />
+  <!-- Interest: los tres ejes, apilandose al bajar -->
+  <Apilado lang={lang} />
 
-  <Tarjetas lang={lang} />
+  <!-- Interest: rejilla densa, sin celdas muertas -->
+  <Bento lang={lang} />
+
+  <!-- Desire: la letania de lo que la app no hace -->
+  <Marquee lang={lang} />
+
   <Privacy lang={lang} />
+
+  <!-- Desire: Aprende en scroll horizontal ligado al vertical -->
+  <Horizontal lang={lang} />
+
   <Watch lang={lang} />
+
+  <!-- Action -->
   <Precios lang={lang} />
   <Cierre lang={lang} />
+
+  <Movimiento />
 </Base>

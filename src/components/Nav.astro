@@ -44,19 +44,39 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
 </header>
 
 <style>
+  /* Pildora flotante de cristal, no una barra pegada al borde. */
   .barra {
     position: sticky;
     top: 0;
     z-index: 40;
-    background: color-mix(in srgb, var(--background) 84%, transparent);
-    backdrop-filter: saturate(160%) blur(14px);
-    border-bottom: 0.5px solid var(--separator);
+    padding: 14px 0 0;
+    pointer-events: none;
   }
-  .interior { display: flex; align-items: center; gap: 20px; height: 56px; }
+  .interior {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: 54px;
+    padding-inline: 10px 10px;
+    pointer-events: auto;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--card) 72%, transparent);
+    backdrop-filter: saturate(180%) blur(18px);
+    -webkit-backdrop-filter: saturate(180%) blur(18px);
+    box-shadow:
+      inset 0 0 0 0.5px var(--card-border),
+      0 6px 22px rgba(0, 0, 0, 0.07);
+    max-width: 980px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .interior { box-shadow: inset 0 0 0 0.5px var(--card-border), 0 6px 26px rgba(0, 0, 0, 0.5); }
+  }
+
   .marca {
     display: inline-flex;
     align-items: center;
     gap: 9px;
+    padding-left: 12px;
     font-size: 15px;
     font-weight: 600;
     letter-spacing: -0.01em;
@@ -71,19 +91,35 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     flex: none;
   }
   nav { flex: 1; min-width: 0; }
-  ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; }
+  ul { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; }
   nav a {
+    position: relative;
     font-size: 15px;
     color: var(--ink-soft);
     text-decoration: none;
     white-space: nowrap;
+    transition: color 0.2s ease-out;
   }
-  nav a:hover, nav a[aria-current='page'] { color: var(--ink); }
-  .derecha { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 100%;
+    bottom: -5px;
+    height: 1.5px;
+    border-radius: 2px;
+    background: var(--ink);
+    transition: right 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  nav a:hover { color: var(--ink); }
+  nav a:hover::after, nav a[aria-current='page']::after { right: 0; }
+  nav a[aria-current='page'] { color: var(--ink); }
+
+  .derecha { display: flex; align-items: center; gap: 8px; margin-left: auto; }
   .descarga {
     font-size: 14px;
     font-weight: 600;
-    padding: 7px 15px;
+    padding: 9px 17px;
     border-radius: 999px;
     background: var(--tint);
     color: var(--on-tint);
@@ -93,28 +129,32 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   .descarga:active { transform: scale(0.965); opacity: 0.86; }
 
-  /* Por debajo de 560 no caben marca, tres enlaces, idioma y boton en una
-     fila: se montaban unos encima de otros. Los enlaces bajan a una segunda
-     linea en vez de encogerse hasta solaparse. */
+  @media (max-width: 640px) {
+    ul { gap: 16px; }
+    nav a { font-size: 14px; }
+    .marca span:last-child { display: none; }
+  }
+  /* Por debajo de 560 no caben marca, tres enlaces, idioma y boton en una fila:
+     se montaban unos encima de otros y tocar English abria Soporte. */
   @media (max-width: 560px) {
+    .barra { padding-top: 10px; }
     .interior {
       height: auto;
       flex-wrap: wrap;
       row-gap: 0;
       column-gap: 14px;
-      padding-block: 9px 4px;
+      padding: 9px 10px 4px;
+      border-radius: 26px;
     }
-    .marca { order: 1; }
+    .marca { order: 1; padding-left: 6px; }
     .derecha { order: 2; }
     nav { order: 3; flex: 1 0 100%; }
     ul {
       gap: 20px;
-      padding-block: 8px 6px;
-      /* Si aun asi no caben, se desplazan en horizontal: nunca se ocultan. */
+      padding: 8px 6px 6px;
       overflow-x: auto;
       scrollbar-width: none;
     }
     ul::-webkit-scrollbar { display: none; }
-    nav a { font-size: 14px; }
   }
 </style>

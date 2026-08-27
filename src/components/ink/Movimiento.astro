@@ -1,0 +1,102 @@
+---
+/* Motor de scroll. GSAP + ScrollTrigger, con dos reglas duras:
+ *
+ * 1. El import es DINAMICO y vive dentro de gsap.matchMedia() con la condicion
+ *    "(prefers-reduced-motion: no-preference)". Quien tenga menos movimiento
+ *    activado no descarga ni un byte de la libreria.
+ * 2. Solo se cargan en las paginas que de verdad piden scroll ligado a
+ *    posicion. Un articulo o la pagina de soporte no montan este componente.
+ */
+---
+<script>
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hayTrabajo = document.querySelector('[data-apila], [data-horizontal], [data-escala]');
+
+  if (!quieto && hayTrabajo) {
+    const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ]);
+    gsap.registerPlugin(ScrollTrigger);
+
+    const mm = gsap.matchMedia();
+
+    // --- Apilado de tarjetas -------------------------------------------------
+    // Cada tarjeta se pega y la siguiente sube por encima. La de abajo se
+    // encoge y se apaga un poco, que es lo que da sensacion de profundidad.
+    mm.add('(min-width: 860px) and (prefers-reduced-motion: no-preference)', () => {
+      document.querySelectorAll<HTMLElement>('[data-apila]').forEach((pila) => {
+        const fichas = gsap.utils.toArray<HTMLElement>('[data-ficha]', pila);
+        fichas.forEach((ficha, i) => {
+          const ultima = i === fichas.length - 1;
+          ScrollTrigger.create({
+            trigger: ficha,
+            start: () => `top ${88 + i * 18}`,
+            endTrigger: pila,
+            end: 'bottom bottom',
+            pin: true,
+            pinSpacing: false,
+            invalidateOnRefresh: true,
+          });
+          if (ultima) return;
+          gsap.to(ficha, {
+            scale: 0.94,
+            opacity: 0.55,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: fichas[i + 1],
+              start: 'top bottom',
+              end: `top ${106 + i * 18}`,
+              scrub: 0.5,
+            },
+          });
+        });
+      });
+    });
+
+    // --- Scroll horizontal ---------------------------------------------------
+    // La seccion se pega y la fila se desplaza en X mientras se baja. En movil
+    // no se pega: se deja como carrusel de scroll nativo, que es mejor ahi.
+    mm.add('(min-width: 860px) and (prefers-reduced-motion: no-preference)', () => {
+      document.querySelectorAll<HTMLElement>('[data-horizontal]').forEach((zona) => {
+        const via = zona.querySelector<HTMLElement>('[data-via]');
+        if (!via) return;
+        const recorrido = () => Math.max(0, via.scrollWidth - zona.clientWidth + 48);
+        gsap.to(via, {
+          x: () => -recorrido(),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: zona,
+            start: 'top top',
+            end: () => '+=' + recorrido(),
+            pin: true,
+            scrub: 0.6,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+      });
+    });
+
+    // --- Escala y apagado de imagenes ---------------------------------------
+    // Entra pequena y crece; al salir se apaga. Solo transform y opacity.
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.utils.toArray<HTMLElement>('[data-escala]').forEach((el) => {
+        gsap.fromTo(
+          el,
+          { scale: 0.86, opacity: 0.45 },
+          {
+            scale: 1,
+            opacity: 1,
+            ease: 'none',
+            scrollTrigger: { trigger: el, start: 'top 92%', end: 'top 46%', scrub: 0.5 },
+          }
+        );
+      });
+    });
+
+    // Las imagenes en diferido cambian el alto de la pagina al cargar y dejan
+    // los triggers desfasados; sin esto el pin se calcula con medidas viejas.
+    addEventListener('load', () => ScrollTrigger.refresh());
+  }
+</script>

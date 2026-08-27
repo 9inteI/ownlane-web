@@ -1,0 +1,77 @@
+---
+/* Cinta infinita con lo que la app NO hace. Es el argumento de venta escrito
+ * como una letania, que es donde una cinta tiene sentido y no de adorno.
+ *
+ * Dos copias de la lista, una marcada aria-hidden: el lector de pantalla lee
+ * la frase una vez, no dos. */
+import type { Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+
+const piezas = {
+  es: ['Sin feed', 'Sin kudos', 'Sin seguidores', 'Sin cuenta', 'Sin servidor', 'Sin analítica', 'Sin anuncios', 'Sin nadie mirándote'],
+  en: ['No feed', 'No kudos', 'No followers', 'No account', 'No server', 'No analytics', 'No ads', 'Nobody watching'],
+}[lang];
+---
+<section class="cinta" aria-label={lang === 'es' ? 'Lo que la app no hace' : "What the app doesn't do"}>
+  <div class="via">
+    {[0, 1].map((copia) => (
+      <ul class="tira" aria-hidden={copia === 1 ? 'true' : undefined}>
+        {piezas.map((p) => (
+          <li>
+            <span class="punto" aria-hidden="true"></span>
+            {p}
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</section>
+
+<style>
+  .cinta {
+    position: relative;
+    overflow: hidden;
+    padding: 26px 0;
+    border-block: 0.5px solid var(--separator);
+    /* Se desvanece por los cantos en vez de cortarse en seco. */
+    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  }
+  .via { display: flex; width: max-content; animation: correr 34s linear infinite; }
+  .tira {
+    display: flex;
+    align-items: center;
+    gap: 46px;
+    list-style: none;
+    margin: 0;
+    padding: 0 23px;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: clamp(1.35rem, 2.4vw, 2.1rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+    color: var(--ink-soft-lg);
+  }
+  .punto {
+    width: 9px;
+    height: 9px;
+    border-radius: 50% 44% 54% 46% / 46% 54% 44% 50%;
+    background: var(--tint);
+    flex: none;
+  }
+  @keyframes correr {
+    to { transform: translateX(-50%); }
+  }
+  .cinta:hover .via { animation-play-state: paused; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .via { animation: none; }
+    .cinta { mask-image: none; -webkit-mask-image: none; overflow-x: auto; }
+  }
+</style>

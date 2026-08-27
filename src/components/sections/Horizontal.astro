@@ -1,0 +1,101 @@
+---
+/* Los artículos de Aprende, en scroll horizontal ligado al vertical.
+ * En movil no se pega: se queda como carrusel de scroll nativo, que ahi
+ * funciona mejor que secuestrar el scroll. */
+import { getCollection } from 'astro:content';
+import EvidenceBadge from '../EvidenceBadge.astro';
+import { ruta, rutaArticulo, type Idioma } from '../../i18n/routes';
+import { t } from '../../i18n/ui';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const tr = t(lang);
+
+const arts = (await getCollection('aprende', (a) => a.data.lang === lang)).sort((a, b) => {
+  // Primero lo demostrado, y el mito al final: el remate del argumento.
+  const orden = { solid: 0, reasonable: 1, myth: 2 } as const;
+  return orden[a.data.evidence] - orden[b.data.evidence];
+});
+
+const c = {
+  es: { titulo: 'Lo que está demostrado, y lo que solo se repite', pie: 'Cada artículo cita sus fuentes.', ver: 'Ver todo' },
+  en: { titulo: "What's proven, and what just gets repeated", pie: 'Every article cites its sources.', ver: 'See all' },
+}[lang];
+---
+<section class="zona" data-horizontal>
+  <div class="marco">
+    <header class="fijo">
+      <h2>{c.titulo}</h2>
+      <p class="pie">{c.pie}</p>
+      <a class="ver" href={ruta('aprende', lang)}>{c.ver} →</a>
+    </header>
+
+    <div class="carril">
+      <div class="via" data-via>
+        {arts.map((a) => (
+          <a class="ficha" href={rutaArticulo(a.data.slug, lang)}>
+            <EvidenceBadge nivel={a.data.evidence} lang={lang} compacto />
+            <h3>{a.data.title}</h3>
+            <p>{a.data.teaser}</p>
+            <span class="minutos">{a.data.minutes} {tr('articulo.minutos')}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .zona { padding: 24px 0; overflow: hidden; }
+  .marco {
+    display: grid;
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: 40px;
+    align-items: center;
+    width: 100%;
+    max-width: var(--ancho);
+    margin-inline: auto;
+    padding-inline: 20px;
+    min-height: 78vh;
+  }
+  h2 { font-size: clamp(1.9rem, 3.4vw, 3rem); letter-spacing: -0.03em; max-width: 16ch; }
+  .pie { margin-top: 16px; color: var(--ink-soft); }
+  .ver { display: inline-block; margin-top: 20px; font-weight: 600; text-decoration: none; }
+  .ver:hover { text-decoration: underline; }
+
+  .carril { overflow: visible; }
+  .via { display: flex; gap: 16px; width: max-content; }
+
+  .ficha {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 290px;
+    min-height: 300px;
+    padding: 24px;
+    border-radius: var(--radius-card);
+    background: var(--card);
+    border: 0.5px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    text-decoration: none;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ficha:hover { transform: translateY(-4px); }
+  .ficha h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .ficha p { font-size: 15px; color: var(--ink-soft); }
+  .minutos { margin-top: auto; font-size: 12px; color: var(--ink-soft); }
+
+  @media (max-width: 859px) {
+    .marco { grid-template-columns: 1fr; gap: 26px; min-height: 0; }
+    /* Sin pin: carrusel de scroll nativo, con el gesto que ya espera el dedo. */
+    .carril {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      margin-inline: -20px;
+      padding: 4px 20px 18px;
+      scrollbar-width: none;
+    }
+    .carril::-webkit-scrollbar { display: none; }
+    .ficha { scroll-snap-align: start; width: 74vw; max-width: 300px; }
+  }
+</style>
