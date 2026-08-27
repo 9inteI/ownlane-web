@@ -1,0 +1,117 @@
+---
+/* Mancha dramatica con brillo especular, como la tinta del icono: negra y
+ * mojada. Las capas de brillo van recortadas a la silueta con una mascara
+ * hecha del propio SVG; sin ella el barrido de luz seria un rectangulo
+ * cruzando por encima. */
+const svgs = import.meta.glob<string>('./splats/splatter-*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+interface Props {
+  variante?: 1 | 2 | 3;
+  tam?: string;
+  opacidad?: number;
+  /** El barrido de luz. Una sola pasada al entrar en viewport, nunca en bucle. */
+  brillo?: boolean;
+  /** Factor de parallax. 0 lo deja quieto. */
+  parallax?: number;
+  clase?: string;
+  estilo?: string;
+}
+const {
+  variante = 1,
+  tam = '420px',
+  opacidad = 1,
+  brillo = false,
+  parallax = 0,
+  clase = '',
+  estilo = '',
+} = Astro.props;
+
+const bruto = svgs[`./splats/splatter-${variante}.svg`];
+
+// La misma silueta, en negro, como mascara. Va en el CSS, no en el DOM.
+const mascara = `url("data:image/svg+xml,${encodeURIComponent(
+  bruto.replace('fill="currentColor"', 'fill="%23000"')
+)}")`;
+---
+<div
+  class:list={['salpicadura', { conBrillo: brillo }, clase]}
+  aria-hidden="true"
+  style={`--tam:${tam};--op:${opacidad};--mascara:${mascara};${estilo}`}
+  data-brilla={brillo ? '' : undefined}
+  data-parallax={parallax ? String(parallax) : undefined}
+>
+  <div class="tinta" set:html={bruto} />
+  {brillo && (
+    <div class="brillos">
+      <div class="mojado"></div>
+      <div class="luz"></div>
+    </div>
+  )}
+</div>
+
+<style>
+  .salpicadura {
+    position: absolute;
+    width: var(--tam);
+    height: var(--tam);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    /* Componible: --tx lo pone quien coloca la mancha, --desvio el parallax. */
+    transform: translate(var(--tx, 0), var(--desvio, 0));
+  }
+  .tinta { position: absolute; inset: 0; color: var(--splash); opacity: var(--op); }
+  .tinta :global(svg) { width: 100%; height: 100%; display: block; }
+
+  /* Todo el brillo, recortado a la silueta. */
+  .brillos {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    mask-image: var(--mascara);
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-image: var(--mascara);
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+  }
+
+  /* Superficie esferica mojada, arriba a la izquierda. Fija, no se anima. */
+  .mojado {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 33% 26%, var(--gloss) 0%, rgba(255, 255, 255, 0) 48%);
+  }
+
+  /* El barrido de luz. Una pasada, en cuanto entra en viewport. */
+  .luz {
+    position: absolute;
+    inset: -20%;
+    background: linear-gradient(
+      105deg,
+      transparent 42%,
+      rgba(255, 255, 255, 0.2) 48%,
+      rgba(255, 255, 255, 0.46) 52%,
+      transparent 58%
+    );
+    opacity: 0;
+    transform: translateX(-55%);
+  }
+  :global(.js) .salpicadura.brilla .luz {
+    animation: barrido 1.4s cubic-bezier(0.3, 0, 0.2, 1) 0.3s 1 both;
+  }
+  @keyframes barrido {
+    0% { opacity: 0; transform: translateX(-55%); }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(55%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .luz { display: none; }
+  }
+</style>

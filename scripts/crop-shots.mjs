@@ -17,7 +17,6 @@ import { readdirSync } from 'node:fs';
 const ORIGEN = 'src/assets/capturas';
 const ANCHO_MOVIL = 1010;
 const ARRIBA = 452;
-const RADIO = 58;
 const FONDO = [245, 245, 247];
 
 const esFondo = (r, g, b) =>
@@ -41,16 +40,13 @@ for (const fichero of readdirSync(ORIGEN).filter((f) => /^appstore-\d\.png$/.tes
   while (abajo > ARRIBA && esFondo(...px(cx, abajo))) abajo--;
   const alto = abajo - ARRIBA + 1;
 
-  // Esquinas transparentes: asi el mockup compone igual en claro y en oscuro.
-  const mascara = Buffer.from(
-    `<svg width="${ANCHO_MOVIL}" height="${alto}">` +
-      `<rect width="${ANCHO_MOVIL}" height="${alto}" rx="${RADIO}" ry="${RADIO}" fill="#fff"/></svg>`
-  );
-
+  // Sin redondear aqui. appstore-shots.py usa radio 58 sobre 1010 px de ancho
+  // (5,7%), y la pantalla de un iPhone ronda el 14%: recortado con 58 se ve
+  // cuadrado. El redondeo lo pone el marco en CSS, que si sabe el radio bueno
+  // y ademas recorta por encima de estas esquinas.
   const salida = ruta.replace('.png', '-movil.png');
   await sharp(ruta)
     .extract({ left: izquierda, top: ARRIBA, width: ANCHO_MOVIL, height: alto })
-    .composite([{ input: mascara, blend: 'dest-in' }])
     .png({ compressionLevel: 9 })
     .toFile(salida);
 

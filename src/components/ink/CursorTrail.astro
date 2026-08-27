@@ -1,0 +1,108 @@
+---
+/* Rastro de tinta tras el puntero. Solo raton fino, solo si el usuario no ha
+ * pedido menos movimiento, y solo dentro de su contenedor. */
+---
+<canvas class="rastro" aria-hidden="true"></canvas>
+
+<script is:inline>
+  (() => {
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const lienzo = document.querySelector('canvas.rastro');
+    if (!lienzo) return;
+    const zona = lienzo.parentElement;
+    const ctx = lienzo.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    // devicePixelRatio a 1 y estirado por CSS: el trazo sale un punto
+    // desenfocado —lo cual ayuda a que parezca tinta— y ahorra el 75% de pixeles.
+    let ancho = 0;
+    let alto = 0;
+    const medir = () => {
+      const c = zona.getBoundingClientRect();
+      const w = Math.round(c.width);
+      const h = Math.round(c.height);
+      if (w === ancho && h === alto) return;
+      ancho = lienzo.width = w;
+      alto = lienzo.height = h;
+    };
+    // ResizeObserver y no un medir() suelto: este script corre en linea, antes
+    // de que las imagenes del hero hayan fijado su altura, y midiendo una sola
+    // vez el lienzo se quedaba en la altura provisional de la seccion.
+    if ('ResizeObserver' in window) new ResizeObserver(medir).observe(zona);
+    else addEventListener('resize', medir, { passive: true });
+    medir();
+
+    const tinta = getComputedStyle(document.documentElement)
+      .getPropertyValue('--splash')
+      .trim() || '#1d1d1f';
+
+    let x = -1, y = -1, px = -1, py = -1;
+    let lazo = 0;
+    let ocioso = 0;
+
+    const marco = () => {
+      lazo = 0;
+      // Desvanecido: se borra un poco de lo pintado en cada frame.
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,0.055)';
+      ctx.fillRect(0, 0, ancho, alto);
+      ctx.globalCompositeOperation = 'source-over';
+
+      if (px >= 0 && (x !== px || y !== py)) {
+        // Grosor segun velocidad: rapido afina, lento engorda. Como la pintura.
+        const v = Math.hypot(x - px, y - py);
+        const grosor = Math.max(1.6, 16 - v * 0.42);
+        ctx.strokeStyle = tinta;
+        ctx.globalAlpha = 0.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = grosor;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      px = x;
+      py = y;
+
+      if (++ocioso < 40) lazo = requestAnimationFrame(marco);
+    };
+
+    zona.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType !== 'mouse') return;
+        const c = zona.getBoundingClientRect();
+        x = e.clientX - c.left;
+        y = e.clientY - c.top;
+        ocioso = 0;
+        if (!lazo) {
+          px = x;
+          py = y;
+          lazo = requestAnimationFrame(marco);
+        }
+      },
+      { passive: true }
+    );
+
+    zona.addEventListener('pointerleave', () => { x = px = -1; }, { passive: true });
+  })();
+</script>
+
+<style>
+  .rastro {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.55;
+  }
+  @media (prefers-reduced-motion: reduce), (hover: none) {
+    .rastro { display: none; }
+  }
+</style>

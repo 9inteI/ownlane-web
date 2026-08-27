@@ -1,0 +1,70 @@
+---
+/* Orquesta la capa de tinta. Sin librerias.
+ *
+ * Se descarto GSAP + ScrollTrigger: son ~70 KB comprimidos y aqui lo unico
+ * que pide scroll ligado a posicion es un parallax de una mancha. El resto
+ * (goteo, brillo, entradas) dispara al entrar en viewport, que es un
+ * IntersectionObserver. Cambiar 70 KB por 40 lineas era la operacion evidente
+ * con un presupuesto de 90 KB de JS y un objetivo de LCP por debajo de 1,8 s.
+ */
+---
+<script is:inline>
+  (() => {
+    const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Goteo y brillo: una sola pasada al entrar. Se deja de observar despues.
+    const unaVez = (selector, clase) => {
+      const nodos = document.querySelectorAll(selector);
+      if (!nodos.length) return;
+      if (quieto || !('IntersectionObserver' in window)) {
+        nodos.forEach((n) => n.classList.add(clase));
+        return;
+      }
+      const vigia = new IntersectionObserver(
+        (entradas) => {
+          for (const e of entradas) {
+            if (!e.isIntersecting) continue;
+            e.target.classList.add(clase);
+            vigia.unobserve(e.target);
+          }
+        },
+        { threshold: 0.15 }
+      );
+      nodos.forEach((n) => vigia.observe(n));
+    };
+
+    unaVez('[data-gotea]', 'gotea');
+    unaVez('[data-brilla]', 'brilla');
+
+    // Parallax: lo unico ligado a la posicion del scroll. Solo transform,
+    // leido una vez por frame y con will-change puesto y quitado a mano
+    // (nunca mas de tres capas promovidas a la vez).
+    const capas = [...document.querySelectorAll('[data-parallax]')].slice(0, 3);
+    if (!quieto && capas.length) {
+      let pendiente = false;
+      const pintar = () => {
+        pendiente = false;
+        const alto = innerHeight;
+        for (const capa of capas) {
+          const caja = capa.getBoundingClientRect();
+          if (caja.bottom < -200 || caja.top > alto + 200) {
+            capa.style.willChange = '';
+            continue;
+          }
+          capa.style.willChange = 'transform';
+          const factor = parseFloat(capa.dataset.parallax) || 0.12;
+          const avance = (caja.top + caja.height / 2 - alto / 2) / alto;
+          capa.style.setProperty('--desvio', (avance * factor * alto).toFixed(1) + 'px');
+        }
+      };
+      const alScroll = () => {
+        if (pendiente) return;
+        pendiente = true;
+        requestAnimationFrame(pintar);
+      };
+      addEventListener('scroll', alScroll, { passive: true });
+      addEventListener('resize', alScroll, { passive: true });
+      pintar();
+    }
+  })();
+</script>

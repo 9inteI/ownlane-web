@@ -2,6 +2,7 @@
 import Head from '../components/Head.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Tinta from '../components/ink/Tinta.astro';
 import { t } from '../i18n/ui';
 import { rutas, type Idioma, type Pagina } from '../i18n/routes';
 import '../styles/base.css';
@@ -32,6 +33,7 @@ const tr = t(lang);
       <slot />
     </main>
     <Footer lang={lang} />
+    <Tinta />
 
     <!-- Reveals: CSS + IntersectionObserver, sin librerias. Los elementos ya
          estan en el HTML visibles; esto solo anima su entrada. -->

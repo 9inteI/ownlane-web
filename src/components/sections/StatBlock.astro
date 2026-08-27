@@ -1,4 +1,5 @@
 ---
+import EdgeDrip from '../ink/EdgeDrip.astro';
 import { dato } from '../../data/landing';
 import type { Idioma } from '../../i18n/routes';
 
@@ -7,6 +8,7 @@ const { lang } = Astro.props;
 const c = dato[lang];
 ---
 <section class="bloque">
+  <EdgeDrip variante="a" lado="abajo" />
   <div class="envoltorio interior">
     <div class="cifras">
       {c.cifras.map((f) => (
@@ -27,7 +29,9 @@ const c = dato[lang];
   /* Bloque invertido: tinta sobre papel en claro, papel calido sobre tinta en
      oscuro. Es Palette.inverseSurface tal cual. */
   .bloque {
-    margin: 88px 0;
+    position: relative;
+    /* El margen inferior deja sitio al goteo, que cuelga fuera de la caja. */
+    margin: 152px 0 236px;
     background: var(--inverse-surface);
     color: var(--inverse-ink);
     padding: 56px 0;

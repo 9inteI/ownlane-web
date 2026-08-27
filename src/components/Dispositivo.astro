@@ -1,0 +1,130 @@
+---
+/* Marco de iPhone dibujado a mano.
+ *
+ * No se usa arte de dispositivo de Apple: sus imagenes de producto tienen
+ * condiciones de uso propias. Esto es geometria y degradados, asi que pesa
+ * cero bytes de imagen y escala sin perder nitidez.
+ *
+ * Proporciones reales de un iPhone de 6,1": pantalla 393x852 pt, radio de
+ * esquina ~55 pt (14% del ancho) y bisel de ~2,3 mm. La captura ya trae la
+ * isla dinamica dibujada dentro, asi que aqui NO se anade otra.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** Ancho del cuerpo del telefono en px. */
+  ancho?: number;
+  prioritario?: boolean;
+  /** Inclinacion en grados. 0 lo deja de frente. */
+  giro?: number;
+  clase?: string;
+}
+const { src, alt, ancho = 300, prioritario = false, giro = 0, clase = '' } = Astro.props;
+
+// El ancho que se le pide a la imagen es el del hueco de pantalla, no el del
+// cuerpo: el bisel se come un 3,2% por lado.
+const anchoPantalla = Math.round(ancho * 0.936);
+---
+<div class:list={['dispositivo', clase]} style={`--ancho:${ancho}px;--giro:${giro}deg`}>
+  <div class="cuerpo">
+    <div class="pantalla">
+      <Image
+        src={src}
+        alt={alt}
+        width={anchoPantalla}
+        densities={[1, 2]}
+        quality={78}
+        loading={prioritario ? 'eager' : 'lazy'}
+        fetchpriority={prioritario ? 'high' : 'auto'}
+      />
+      <span class="reflejo" aria-hidden="true"></span>
+    </div>
+    <span class="boton silencio" aria-hidden="true"></span>
+    <span class="boton vol-arriba" aria-hidden="true"></span>
+    <span class="boton vol-abajo" aria-hidden="true"></span>
+    <span class="boton lateral" aria-hidden="true"></span>
+  </div>
+</div>
+
+<style>
+  .dispositivo {
+    --bisel: calc(var(--ancho) * 0.032);
+    --radio: calc(var(--ancho) * 0.142);
+    width: var(--ancho);
+    max-width: 100%;
+    transform: rotate(var(--giro));
+    /* Sombra en dos capas, como cualquier objeto real: una de contacto,
+       corta y densa, y otra ambiental, larga y difusa. Una sola sombra es
+       lo que hace que un mockup parezca una pegatina. */
+    filter:
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.16))
+      drop-shadow(0 26px 50px rgba(0, 0, 0, 0.22));
+  }
+
+  .cuerpo {
+    position: relative;
+    padding: var(--bisel);
+    border-radius: var(--radio);
+    /* Canto de titanio: el degradado va en diagonal para que los lados
+       izquierdo y derecho no se iluminen igual. */
+    background:
+      linear-gradient(148deg, #6e6e73 0%, #1c1c1e 18%, #48484a 42%, #101012 62%, #5a5a5f 86%, #232326 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+      inset 0 0 0 2.5px rgba(0, 0, 0, 0.55);
+  }
+
+  .pantalla {
+    position: relative;
+    overflow: hidden;
+    border-radius: calc(var(--radio) - var(--bisel));
+    background: #000;
+    line-height: 0;
+  }
+  .pantalla :global(img) { width: 100%; height: auto; display: block; }
+
+  /* Reflejo del cristal: una banda diagonal muy tenue. Estatica, no se anima. */
+  .reflejo {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      104deg,
+      rgba(255, 255, 255, 0) 36%,
+      rgba(255, 255, 255, 0.055) 45%,
+      rgba(255, 255, 255, 0.09) 49%,
+      rgba(255, 255, 255, 0.02) 55%,
+      rgba(255, 255, 255, 0) 64%
+    );
+    mix-blend-mode: overlay;
+  }
+
+  /* Botones. Sobresalen medio pixel del canto: sin ellos el cuerpo se lee
+     como un rectangulo, no como un aparato. */
+  .boton {
+    position: absolute;
+    width: calc(var(--ancho) * 0.008);
+    background: linear-gradient(180deg, #55555a, #2a2a2d 40%, #55555a);
+    border-radius: 1px;
+  }
+  .silencio { left: calc(var(--ancho) * -0.006); top: 16%; height: 4.2%; }
+  .vol-arriba { left: calc(var(--ancho) * -0.006); top: 23%; height: 6.4%; }
+  .vol-abajo { left: calc(var(--ancho) * -0.006); top: 31.5%; height: 6.4%; }
+  .lateral { right: calc(var(--ancho) * -0.006); top: 25%; height: 8.6%; }
+
+  @media (prefers-color-scheme: dark) {
+    .dispositivo {
+      filter:
+        drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
+        drop-shadow(0 26px 54px rgba(0, 0, 0, 0.7));
+    }
+    /* En oscuro el canto se aclara: si no, el telefono desaparece en el fondo. */
+    .cuerpo {
+      background:
+        linear-gradient(148deg, #8e8e93 0%, #3a3a3c 18%, #6b6b70 42%, #2c2c2e 62%, #7c7c81 86%, #414144 100%);
+    }
+  }
+</style>

@@ -1,6 +1,6 @@
 ---
 import AppStoreBadge from '../AppStoreBadge.astro';
-import InkSplash from '../ink/InkSplash.astro';
+import Splatter from '../ink/Splatter.astro';
 import { cierre } from '../../data/landing';
 import type { Idioma } from '../../i18n/routes';
 
@@ -9,7 +9,14 @@ const { lang } = Astro.props;
 const c = cierre[lang];
 ---
 <section class="cierre">
-  <InkSplash variante={3} opacidad={0.1} tam="min(560px, 74vw)" estilo="top:-140px;left:50%;transform:translateX(-50%)" />
+  <Splatter
+    variante={3}
+    tam="min(620px, 80vw)"
+    opacidad={0.1}
+    brillo
+    parallax={0.07}
+    estilo="top:-170px;left:50%;--tx:-50%"
+  />
   <div class="envoltorio centro">
     <h2>{c.titulo}</h2>
     <p class="texto">{c.texto}</p>

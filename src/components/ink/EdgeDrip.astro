@@ -1,0 +1,62 @@
+---
+/* El canto por el que un bloque de tinta chorrea.
+ * Cada gota es su propio path y se anima con scaleY desde arriba: puro
+ * compositing, ni layout ni paint. Nada de deformar geometria por frame. */
+const svgs = import.meta.glob<string>('./drip-*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+interface Props {
+  variante?: 'a' | 'b';
+  /** 'abajo' cuelga del canto inferior; 'arriba' sube desde el superior. */
+  lado?: 'abajo' | 'arriba';
+  color?: string;
+  clase?: string;
+}
+const { variante = 'a', lado = 'abajo', color = 'var(--inverse-surface)', clase = '' } = Astro.props;
+const bruto = svgs[`./drip-${variante}.svg`];
+---
+<div
+  class:list={['borde', lado, clase]}
+  aria-hidden="true"
+  data-gotea
+  style={`--color:${color}`}
+  set:html={bruto}
+/>
+
+<style>
+  /* La altura sale del SVG (viewBox 1200x150, height auto), asi las gotas
+     escalan con el ancho de pagina en vez de recortarse contra una caja fija.
+     top/bottom: 100% las cuelga del canto sin saber cuanto miden. */
+  .borde {
+    position: absolute;
+    left: 0;
+    right: 0;
+    color: var(--color);
+    pointer-events: none;
+    z-index: 2;
+    line-height: 0;
+  }
+  .abajo { top: 100%; }
+  .arriba { bottom: 100%; transform: scaleY(-1); }
+  .borde :global(svg) { width: 100%; height: auto; display: block; }
+
+  /* Estado inicial solo con JS: sin el, las gotas ya estan caidas. */
+  :global(.js) .borde :global(.gota) {
+    transform: scaleY(0.12);
+    transform-origin: var(--x) 0;
+    transform-box: view-box;
+  }
+  :global(.js) .borde.gotea :global(.gota) {
+    transform: scaleY(1);
+    transition: transform 0.85s cubic-bezier(0.16, 0.9, 0.3, 1);
+    transition-delay: var(--retardo);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Estado final, no invisible: la gota ya ha caido. */
+    :global(.js) .borde :global(.gota) { transform: none; }
+  }
+</style>
