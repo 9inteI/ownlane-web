@@ -20,7 +20,7 @@ function prng(s) {
 const r2 = (n) => Math.round(n * 10) / 10;
 
 const ANCHO = 1200;
-const ALTO = 250;
+const ALTO = 132;
 
 /** Una gota: cuello estrecho que se ensancha en un bulbo al final.
  *  La cintura es lo que la hace leerse como pintura y no como una salchicha:
@@ -44,19 +44,19 @@ function gota(x, ancho, largo) {
   );
 }
 
-function borde(semilla, cuantas = 11) {
+function borde(semilla, cuantas = 7) {
   const rnd = prng(semilla);
   const gotas = [];
   const paso = ANCHO / cuantas;
   // Tres gotas largas garantizadas. Dejarlo al azar sale a veces un peine
   // de gotas todas iguales, que es justo lo que no queremos.
   const largas = new Set();
-  while (largas.size < 3) largas.add(Math.floor(rnd() * cuantas));
+  while (largas.size < 2) largas.add(Math.floor(rnd() * cuantas));
   for (let i = 0; i < cuantas; i++) {
     const x = paso * (i + 0.5) + (rnd() - 0.5) * paso * 0.7;
-    const ancho = 26 + rnd() * 60;
+    const ancho = 20 + rnd() * 40;
     // Una de cada cuatro cae mucho mas: si todas miden igual parece un peine.
-    const largo = largas.has(i) ? 132 + rnd() * 96 : 34 + rnd() * 62;
+    const largo = largas.has(i) ? 72 + rnd() * 44 : 18 + rnd() * 30;
     gotas.push({ x, d: gota(x, ancho, largo), retardo: r2(rnd() * 0.5), largo });
   }
   return gotas.sort((a, b) => a.x - b.x);

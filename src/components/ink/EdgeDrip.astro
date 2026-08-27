@@ -45,13 +45,13 @@ const bruto = svgs[`./drip-${variante}.svg`];
 
   /* Estado inicial solo con JS: sin el, las gotas ya estan caidas. */
   :global(.js) .borde :global(.gota) {
-    transform: scaleY(0.12);
+    transform: scaleY(0.28);
     transform-origin: var(--x) 0;
     transform-box: view-box;
   }
   :global(.js) .borde.gotea :global(.gota) {
     transform: scaleY(1);
-    transition: transform 0.85s cubic-bezier(0.16, 0.9, 0.3, 1);
+    transition: transform 1.05s cubic-bezier(0.22, 0.7, 0.25, 1);
     transition-delay: var(--retardo);
   }
 
