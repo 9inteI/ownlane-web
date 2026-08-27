@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Own Lane · Soporte</title>
+<meta name="description" content="Ayuda y contacto de Own Lane, la app para empezar a correr sin red social.">
+<style>
+/* El mismo chasis que la app: fondo claro, tinta negra, SF Pro del sistema y
+   nada de color más allá del acento, que es la propia tinta. */
+:root {
+  --fondo: #f5f5f7;
+  --tarjeta: #ffffff;
+  --tinta: #1d1d1f;
+  --suave: #86868b;
+  --linea: rgba(60, 60, 67, 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #000000;
+    --tarjeta: #151517;
+    --tinta: #f5f5f7;
+    --suave: #9a9aa0;
+    --linea: rgba(255, 255, 255, 0.12);
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0 20px 80px;
+  background: var(--fondo);
+  color: var(--tinta);
+  font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.envoltorio { max-width: 680px; margin: 0 auto; }
+header { padding: 72px 0 8px; }
+.marca { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--suave); }
+h1 { font-size: clamp(34px, 7vw, 46px); line-height: 1.1; letter-spacing: -0.02em; margin: 14px 0 6px; }
+h2 { font-size: 22px; letter-spacing: -0.01em; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 26px 0 6px; }
+p, li { color: var(--tinta); }
+.sutil { color: var(--suave); }
+.tarjeta {
+  background: var(--tarjeta);
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin: 22px 0;
+  border: 1px solid var(--linea);
+}
+.tarjeta p:first-child { margin-top: 0; }
+.tarjeta p:last-child { margin-bottom: 0; }
+a { color: var(--tinta); text-decoration: underline; text-underline-offset: 3px; }
+code { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--linea); color: var(--suave); font-size: 14px; }
+footer a { color: var(--suave); }
+</style>
+</head>
+<body>
+<div class="envoltorio">
+<header>
+  <div class="marca">Own Lane</div>
+  <h1>Soporte</h1>
+  <p class="sutil">Una app para empezar a correr y seguir corriendo. Sin feed, sin kudos, sin nadie mirándote.</p>
+</header>
+
+<div class="tarjeta">
+  <p><strong>¿Necesitas ayuda?</strong> Escribe a <a href="mailto:rbd.cysec@pm.me">rbd.cysec@pm.me</a>.</p>
+  <p class="sutil">Contesto yo, no un formulario. Suele tardar un par de días.</p>
+</div>
+
+<h2>Preguntas habituales</h2>
+
+<h3>¿Qué es gratis y qué es de pago?</h3>
+<p>Gratis: el plan entero hasta tu meta, grabar tus salidas con GPS, mapa y parciales, los recordatorios, el historial, el progreso y toda la sección Aprende. Y el plan se sigue ajustando a cómo te sientas pagues o no.</p>
+<p>Own Lane Plus añade la rutina de fuerza guiada, el plan del día de la carrera, la lectura interpretada de cada salida y la gráfica de pulsaciones.</p>
+
+<h3>¿Cómo cancelo la suscripción?</h3>
+<p>Desde el iPhone: <strong>Ajustes → tu nombre → Suscripciones → Own Lane</strong>. También puedes hacerlo desde la propia app, en Ajustes → Gestionar. La cancelación la gestiona Apple, no nosotros.</p>
+
+<h3>El plan me parece demasiado duro (o demasiado fácil)</h3>
+<p>Responde a «¿cómo te has sentido?» al terminar cada salida. Si varias seguidas te resultan duras, el plan baja un escalón solo. Si te sobran, sube antes de lo previsto. Es la función más importante de la app y no cuesta dinero.</p>
+
+<h3>No me mide bien la distancia</h3>
+<p>Own Lane descarta las lecturas de GPS imprecisas para no inflar los kilómetros. Bajo árboles densos, entre edificios altos o en una cinta, la distancia puede quedarse corta. Dale unos segundos al aire libre antes de empezar.</p>
+
+<h3>No veo mis pulsaciones</h3>
+<p>El iPhone no las mide: vienen del Apple Watch. Necesitas llevarlo puesto y haber dado permiso en la app Salud. Sin reloj no hay datos que enseñar, y la app lo dice en vez de inventar una gráfica.</p>
+
+<h3>¿Se puede usar en el Apple Watch?</h3>
+<p>Sí. Puedes empezar, pausar y terminar la sesión desde la muñeca, con aviso por vibración en cada cambio de intervalo, y consultar tu plan, tu historial y tu progreso sin sacar el móvil.</p>
+
+<h3>He perdido mis datos</h3>
+<p>Todo se guarda en tu iPhone y en ningún otro sitio. Si borras la app, se borra todo; no hay copia en un servidor porque no hay servidor. Las salidas que Own Lane escribe en la app Salud sí se conservan.</p>
+
+<h2>Aviso</h2>
+<div class="tarjeta">
+  <p>Own Lane no sustituye a un médico ni a un fisioterapeuta. Si algo te duele, para y consúltalo. Los días de descanso del plan no son opcionales.</p>
+</div>
+
+<footer>
+  <a href="privacidad.html">Política de privacidad</a> · Own Lane
+</footer>
+</div>
+</body>
+</html>
