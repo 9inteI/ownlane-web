@@ -37,6 +37,13 @@
             pin: true,
             pinSpacing: false,
             invalidateOnRefresh: true,
+            // Con varias secciones pinneadas, ScrollTrigger tiene que calcular
+            // las de arriba ANTES que las de abajo. Sin esto, y encima con
+            // pinSpacing:false, la pila altera el alto del documento despues
+            // de que el scroll horizontal haya cacheado su start/end: el
+            // resultado es que la seccion siguiente arranca en el sitio
+            // equivocado y se recoloca sola a mitad de gesto.
+            refreshPriority: 10 - i,
           });
           if (ultima) return;
           gsap.to(ficha, {
@@ -80,6 +87,7 @@
             scrub: 0.35,
             anticipatePin: 1,
             invalidateOnRefresh: true,
+            refreshPriority: 0,
           },
         });
       });
@@ -102,8 +110,14 @@
       });
     });
 
-    // Las imagenes en diferido cambian el alto de la pagina al cargar y dejan
-    // los triggers desfasados; sin esto el pin se calcula con medidas viejas.
+    // Ordena por refreshPriority y recalcula. Se hace una vez montado todo.
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
+
+    // Las imagenes en diferido y las fuentes cambian el alto de la pagina al
+    // cargar y dejan los triggers desfasados; sin esto el pin se calcula con
+    // medidas viejas y la seccion salta al llegar a ella.
     addEventListener('load', () => ScrollTrigger.refresh());
+    document.fonts?.ready.then(() => ScrollTrigger.refresh());
   }
 </script>

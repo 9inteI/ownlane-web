@@ -58,9 +58,11 @@ const c = {
     width: 100%;
     max-width: var(--ancho);
     margin-inline: auto;
-    /* El padding superior deja pasar la nav flotante (54 + 14 de hueco): sin
-       el, al pegarse el titular quedaba por debajo de la pildora. */
-    padding: 104px 20px 48px;
+    /* Simetrico a proposito: con 104 arriba y 48 abajo el bloque quedaba 56 px
+       descentrado y se leia como "pegado arriba". El de arriba deja pasar la
+       nav flotante (54 de alto + 14 de hueco). */
+    padding: 96px 20px;
+    align-content: center;
     min-height: 100vh;
     min-height: 100dvh;
   }
