@@ -1,19 +1,22 @@
 ---
 import { Image } from 'astro:assets';
-import Dispositivo from '../Dispositivo.astro';
+import GrupoDispositivos from '../GrupoDispositivos.astro';
 import AppStoreBadge from '../AppStoreBadge.astro';
 import InkSplash from '../ink/InkSplash.astro';
 import Splatter from '../ink/Splatter.astro';
 import CursorTrail from '../ink/CursorTrail.astro';
 import { hero } from '../../data/landing';
 import type { Idioma } from '../../i18n/routes';
+import { captura } from '../../data/capturas';
 import logo from '../../assets/brand/ownlane-logo.png';
-import captura from '../../assets/capturas/appstore-1-movil.png';
 
 interface Props { lang: Idioma; }
 const { lang } = Astro.props;
 const c = hero[lang];
 const [linea1, linea2] = c.h1.split('\n');
+
+const hoy = captura('hoy', lang);
+const plan = captura('plan', lang);
 ---
 <section class="hero">
   <Splatter
@@ -50,7 +53,14 @@ const [linea1, linea2] = c.h1.split('\n');
     </div>
 
     <div class="movil">
-      <Dispositivo src={captura} alt={c.captionCaptura} ancho={306} prioritario giro={-1.4} />
+      <GrupoDispositivos
+        ancho={266}
+        prioritario
+        piezas={[
+          { src: hoy.claro, srcOscuro: hoy.oscuro, alt: hoy.alt },
+          { src: plan.claro, srcOscuro: plan.oscuro, alt: plan.alt },
+        ]}
+      />
     </div>
   </div>
 </section>

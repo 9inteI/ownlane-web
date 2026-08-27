@@ -11,11 +11,14 @@ import Cierre from '../components/sections/Cierre.astro';
 import { ejes } from '../data/landing';
 import { APP } from '../data/app';
 
+import { captura } from '../data/capturas';
 import cap2 from '../assets/capturas/appstore-2-movil.png';
 import cap3 from '../assets/capturas/appstore-3-movil.png';
-import cap5 from '../assets/capturas/appstore-5-movil.png';
 
 const lang = 'es' as const;
+
+const plan = captura('plan', lang);
+const aprende = captura('aprende', lang);
 
 const jsonld = {
   '@context': 'https://schema.org',
@@ -49,15 +52,25 @@ const jsonld = {
   <Eje bloque={ejes.sentido[lang]} mancha={2} />
   <Eje
     bloque={ejes.dias[lang]}
-    captura={cap2}
-    alt="Pantalla de progreso: minutos corriendo por semana y salidas recientes"
     invertido
+    piezas={[
+      { src: plan.claro, srcOscuro: plan.oscuro, alt: plan.alt },
+      { src: aprende.claro, srcOscuro: aprende.oscuro, alt: aprende.alt },
+    ]}
   />
   <Eje
     bloque={ejes.salida[lang]}
-    captura={cap3}
-    alt="Detalle de una salida: mapa, pulsaciones y ritmo por kilómetro"
     mancha={1}
+    piezas={[
+      {
+        src: cap3,
+        alt: 'Detalle de una salida: mapa del recorrido, pulsaciones y ritmo por kilómetro',
+      },
+      {
+        src: cap2,
+        alt: 'Pantalla de progreso: minutos corriendo por semana y salidas recientes',
+      },
+    ]}
   />
 
   <Tarjetas lang={lang} />

@@ -1,0 +1,81 @@
+---
+/* Dos o tres dispositivos escalonados.
+ *
+ * El de delante va a tamano completo y de frente; los de detras se escalan y
+ * se desplazan. Se apilan con margenes negativos en vez de posicion absoluta
+ * para que el grupo siga ocupando alto real y no haya que fijarselo a mano.
+ */
+import type { ImageMetadata } from 'astro';
+import Dispositivo from './Dispositivo.astro';
+
+export interface Pieza {
+  src: ImageMetadata;
+  srcOscuro?: ImageMetadata;
+  alt: string;
+}
+
+interface Props {
+  piezas: Pieza[];
+  /** Ancho del dispositivo delantero. */
+  ancho?: number;
+  prioritario?: boolean;
+  /** 'izquierda' pone el principal a la izquierda del grupo. */
+  hacia?: 'izquierda' | 'derecha';
+  clase?: string;
+}
+const { piezas, ancho = 300, prioritario = false, hacia = 'derecha', clase = '' } = Astro.props;
+
+// El principal es el primero; el resto van detras, cada uno mas pequeno.
+const escalas = [1, 0.84, 0.72];
+const giros = hacia === 'derecha' ? [-1.6, 3.4, -4.2] : [1.6, -3.4, 4.2];
+const orden = piezas.slice(0, 3);
+---
+<div
+  class:list={['grupo', hacia, clase]}
+  style={`--ancho:${ancho}px;--solape:${Math.round(ancho * 0.44)}px`}
+>
+  {orden
+    .map((pieza, i) => ({ pieza, i }))
+    .reverse()
+    .map(({ pieza, i }) => (
+      <div class="pieza" style={`--nivel:${i};--z:${orden.length - i}`}>
+        <Dispositivo
+          src={pieza.src}
+          srcOscuro={pieza.srcOscuro}
+          alt={pieza.alt}
+          ancho={Math.round(ancho * escalas[i])}
+          giro={giros[i]}
+          prioritario={prioritario && i === 0}
+        />
+      </div>
+    ))}
+</div>
+
+<style>
+  .grupo {
+    display: flex;
+    /* El grupo es mas ancho que un movil solo: sin esto se sale de la columna
+       y la seccion, que recorta, se lo come por el borde. */
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* En el DOM van del ultimo al primero para que el principal quede encima
+       sin pelear con z-index entre capas apiladas. */
+    flex-direction: row-reverse;
+  }
+  .izquierda { flex-direction: row; }
+
+  .pieza { z-index: var(--z); }
+  /* Cada nivel se solapa con el anterior y se hunde un poco. */
+  .grupo .pieza:not(:last-child) { margin-inline-start: calc(var(--solape) * -1); }
+  .pieza[style*='--nivel:1'] { transform: translateY(calc(var(--ancho) * -0.09)); }
+  .pieza[style*='--nivel:2'] { transform: translateY(calc(var(--ancho) * 0.11)); }
+
+  /* En pantalla estrecha no caben: se queda solo el principal. */
+  @media (max-width: 720px) {
+    .pieza[style*='--nivel:1'],
+    .pieza[style*='--nivel:2'] { display: none; }
+    .grupo .pieza { margin-inline-start: 0; }
+  }
+</style>
