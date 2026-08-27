@@ -1,10 +1,11 @@
 /** Capturas sacadas del simulador con scripts/sim.sh, en las cuatro
  *  combinaciones de tema e idioma, a resolucion nativa (1206x2622).
  *
- *  Progreso y el detalle de una salida NO estan aqui: necesitan salidas
- *  grabadas y un simulador recien instalado las ensena vacias. Para esas dos
- *  se siguen usando los recortes de las capturas de App Store, que solo
- *  existen en claro y en espanol. */
+ *  Progreso y el detalle de una salida necesitan historial: un simulador
+ *  recien instalado los ensena vacios. Los datos que se ven en esas dos los
+ *  siembra scripts/sembrar-simulador.py y son FICTICIOS —quince salidas
+ *  inventadas con ruta por Malaga, parciales y pulsaciones—, no salidas
+ *  reales de nadie. */
 import type { ImageMetadata } from 'astro';
 import type { Idioma } from '../i18n/routes';
 
@@ -20,6 +21,14 @@ import aprendeClaroEs from '../assets/capturas/app/aprende-light-es.png';
 import aprendeOscuroEs from '../assets/capturas/app/aprende-dark-es.png';
 import aprendeClaroEn from '../assets/capturas/app/aprende-light-en.png';
 import aprendeOscuroEn from '../assets/capturas/app/aprende-dark-en.png';
+import progresoClaroEs from '../assets/capturas/app/progreso-light-es.png';
+import progresoOscuroEs from '../assets/capturas/app/progreso-dark-es.png';
+import progresoClaroEn from '../assets/capturas/app/progreso-light-en.png';
+import progresoOscuroEn from '../assets/capturas/app/progreso-dark-en.png';
+import detalleClaroEs from '../assets/capturas/app/detalle-light-es.png';
+import detalleOscuroEs from '../assets/capturas/app/detalle-dark-es.png';
+import detalleClaroEn from '../assets/capturas/app/detalle-light-en.png';
+import detalleOscuroEn from '../assets/capturas/app/detalle-dark-en.png';
 
 export interface Captura {
   claro: ImageMetadata;
@@ -27,7 +36,7 @@ export interface Captura {
   alt: string;
 }
 
-type Pantalla = 'hoy' | 'plan' | 'aprende';
+type Pantalla = 'hoy' | 'plan' | 'aprende' | 'progreso' | 'detalle';
 
 const tabla: Record<Pantalla, Record<Idioma, Captura>> = {
   hoy: {
@@ -41,6 +50,14 @@ const tabla: Record<Pantalla, Record<Idioma, Captura>> = {
   aprende: {
     es: { claro: aprendeClaroEs, oscuro: aprendeOscuroEs, alt: 'Pantalla Aprende: artículos con su nivel de evidencia' },
     en: { claro: aprendeClaroEn, oscuro: aprendeOscuroEn, alt: 'Learn screen: articles with their evidence level' },
+  },
+  progreso: {
+    es: { claro: progresoClaroEs, oscuro: progresoOscuroEs, alt: 'Pantalla Progreso: minutos corriendo por semana y salidas recientes' },
+    en: { claro: progresoClaroEn, oscuro: progresoOscuroEn, alt: 'Progress screen: minutes running per week and recent runs' },
+  },
+  detalle: {
+    es: { claro: detalleClaroEs, oscuro: detalleOscuroEs, alt: 'Detalle de una salida: mapa del recorrido, tiempo, distancia y pulsaciones' },
+    en: { claro: detalleClaroEn, oscuro: detalleOscuroEn, alt: 'Run detail: route map, time, distance and heart rate' },
   },
 };
 

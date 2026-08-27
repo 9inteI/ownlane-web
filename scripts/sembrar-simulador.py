@@ -11,7 +11,7 @@ Los numeros son FICTICIOS. Sirven para la captura, no son datos reales.
 
 Uso:  python3 scripts/sembrar-simulador.py <udid>
 """
-import json, math, os, subprocess, sys, uuid, shutil
+import json, math, os, random, subprocess, sys, uuid, shutil
 
 UDID = sys.argv[1] if len(sys.argv) > 1 else 'E49B61B1-7BEB-46F4-A4B2-54CB7385A4A9'
 BUNDLE = 'com.rubendiaz.ownlane'
@@ -53,16 +53,34 @@ def ruta(vueltas=1.0, puntos=180, radio=0.0075):
         })
     return fuera
 
-def pulsaciones(segundos, media, pico, bloques):
-    """Sube y baja con los bloques de correr y andar, con deriva al final."""
+def pulsaciones(segundos, media, pico, bloques, semilla):
+    """Sube y baja con los bloques de correr y andar, con deriva al final.
+
+    Con una sinusoide limpia la grafica canta que es inventada: un pulso real
+    nunca dibuja arcos identicos. Aqui la onda base lleva ruido correlacionado
+    (un paseo aleatorio suave, no ruido blanco, que temblaria demasiado), la
+    subida es mas rapida que la bajada —el corazon sube antes de lo que baja— y
+    cada bloque cuesta un poco distinto.
+    """
+    rnd = random.Random(semilla)
     fuera = []
-    t = 0.0
+    t, deambular = 0.0, 0.0
+    peso = [1 + rnd.uniform(-0.09, 0.09) for _ in range(bloques + 2)]
     while t < segundos:
-        fase = math.sin((t / segundos) * math.pi * bloques * 2 - math.pi / 2)
-        deriva = (t / segundos) * 9
-        bpm = media + fase * (pico - media) * 0.78 + deriva
-        fuera.append({'offset': round(t, 1), 'bpm': round(min(pico, max(96, bpm)), 1)})
-        t += 20
+        frac = t / segundos
+        ciclo = frac * bloques
+        dentro = ciclo % 1
+        # Sube en el primer 40% del bloque y baja en el 60% restante.
+        subida = math.sin(dentro / 0.4 * math.pi / 2) if dentro < 0.4 \
+            else math.cos((dentro - 0.4) / 0.6 * math.pi / 2)
+        # Centrada en -1..1: si la onda solo sube (0..1) la media se va
+        # veinte pulsaciones por encima de la que se pretendia.
+        fase = subida * 2 - 1
+        deambular = deambular * 0.72 + rnd.uniform(-1.5, 1.5)
+        deriva = frac * 9
+        bpm = media + fase * (pico - media) * 0.8 * peso[int(ciclo)] + deriva + deambular
+        fuera.append({'offset': round(t, 1), 'bpm': round(min(pico + 3, max(96, bpm)), 1)})
+        t += 15
     return fuera
 
 def parciales(km, ritmo):
@@ -101,7 +119,7 @@ for semana in plan['weeks']:
             'blockPaces': [round(ritmo + (i - bloques / 2) * 9, 1) for i in range(bloques)],
             'route': ruta(radio=0.0042 + km * 0.0009),
             'splits': parciales(km, ritmo),
-            'heartRates': pulsaciones(duracion, media, media + 24, bloques),
+            'heartRates': pulsaciones(duracion, media, media + 24, bloques, semilla=hechas * 977 + 13),
             'averageCadence': round(163 + avance * 7, 1),
             'effort': esfuerzos[hechas % len(esfuerzos)],
             'hadPain': False,

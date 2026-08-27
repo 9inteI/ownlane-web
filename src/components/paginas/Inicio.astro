@@ -12,8 +12,6 @@ import { ejes } from '../../data/landing';
 import { APP } from '../../data/app';
 
 import { captura } from '../../data/capturas';
-import cap2 from '../../assets/capturas/appstore-2-movil.png';
-import cap3 from '../../assets/capturas/appstore-3-movil.png';
 import type { Idioma } from '../../i18n/routes';
 
 interface Props { lang: Idioma; }
@@ -21,21 +19,19 @@ const { lang } = Astro.props;
 
 const plan = captura('plan', lang);
 const aprende = captura('aprende', lang);
+const progreso = captura('progreso', lang);
+const detalle = captura('detalle', lang);
 
 const meta = {
   es: {
     titulo: 'Own Lane · Correr desde cero, sin feed',
     descripcion:
       'Un plan de running para principiantes que se ajusta a cómo te has sentido y se recoloca cuando fallas un día. Sin feed, sin cuenta y sin servidor.',
-    altSalida: 'Detalle de una salida: mapa del recorrido, pulsaciones y ritmo por kilómetro',
-    altProgreso: 'Pantalla de progreso: minutos corriendo por semana y salidas recientes',
   },
   en: {
     titulo: 'Own Lane · Run from zero, without a feed',
     descripcion:
       'A beginner running plan that adjusts to how the session felt and reschedules when you miss a day. No feed, no account and no server.',
-    altSalida: 'Run detail: route map, heart rate and pace per kilometre',
-    altProgreso: 'Progress screen: minutes running per week and recent runs',
   },
 } as const;
 
@@ -80,14 +76,8 @@ const jsonld = {
     bloque={ejes.salida[lang]}
     mancha={1}
     piezas={[
-      {
-        src: cap3,
-        alt: meta[lang].altSalida,
-      },
-      {
-        src: cap2,
-        alt: meta[lang].altProgreso,
-      },
+      { src: detalle.claro, srcOscuro: detalle.oscuro, alt: detalle.alt },
+      { src: progreso.claro, srcOscuro: progreso.oscuro, alt: progreso.alt },
     ]}
   />
 
