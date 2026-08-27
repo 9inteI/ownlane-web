@@ -21,6 +21,10 @@ import aprendeClaroEs from '../assets/capturas/app/aprende-light-es.png';
 import aprendeOscuroEs from '../assets/capturas/app/aprende-dark-es.png';
 import aprendeClaroEn from '../assets/capturas/app/aprende-light-en.png';
 import aprendeOscuroEn from '../assets/capturas/app/aprende-dark-en.png';
+import progresoRecorteClaroEs from '../assets/capturas/app/progreso-light-es-sinbarra.png';
+import progresoRecorteOscuroEs from '../assets/capturas/app/progreso-dark-es-sinbarra.png';
+import progresoRecorteClaroEn from '../assets/capturas/app/progreso-light-en-sinbarra.png';
+import progresoRecorteOscuroEn from '../assets/capturas/app/progreso-dark-en-sinbarra.png';
 import progresoClaroEs from '../assets/capturas/app/progreso-light-es.png';
 import progresoOscuroEs from '../assets/capturas/app/progreso-dark-es.png';
 import progresoClaroEn from '../assets/capturas/app/progreso-light-en.png';
@@ -36,7 +40,10 @@ export interface Captura {
   alt: string;
 }
 
-type Pantalla = 'hoy' | 'plan' | 'aprende' | 'progreso' | 'detalle';
+/* 'progresoRecorte' es la misma pantalla sin la barra de estado. Dentro de un
+   marco de movil la barra hay que verla; recortada dentro de una tarjeta, la
+   isla dinamica queda flotando y se lee como una mancha negra. */
+type Pantalla = 'hoy' | 'plan' | 'aprende' | 'progreso' | 'progresoRecorte' | 'detalle';
 
 const tabla: Record<Pantalla, Record<Idioma, Captura>> = {
   hoy: {
@@ -54,6 +61,10 @@ const tabla: Record<Pantalla, Record<Idioma, Captura>> = {
   progreso: {
     es: { claro: progresoClaroEs, oscuro: progresoOscuroEs, alt: 'Pantalla Progreso: minutos corriendo por semana y salidas recientes' },
     en: { claro: progresoClaroEn, oscuro: progresoOscuroEn, alt: 'Progress screen: minutes running per week and recent runs' },
+  },
+  progresoRecorte: {
+    es: { claro: progresoRecorteClaroEs, oscuro: progresoRecorteOscuroEs, alt: 'Pantalla Progreso: minutos corriendo por semana' },
+    en: { claro: progresoRecorteClaroEn, oscuro: progresoRecorteOscuroEn, alt: 'Progress screen: minutes running per week' },
   },
   detalle: {
     es: { claro: detalleClaroEs, oscuro: detalleOscuroEs, alt: 'Detalle de una salida: mapa del recorrido, tiempo, distancia y pulsaciones' },

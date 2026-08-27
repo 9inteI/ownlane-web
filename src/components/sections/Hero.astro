@@ -22,7 +22,6 @@ const [linea1, linea2] = c.h1.split('\n');
 
 const hoy = captura('hoy', lang);
 const plan = captura('plan', lang);
-const detalle = captura('detalle', lang);
 ---
 <section class="hero">
   <Splatter
@@ -40,13 +39,7 @@ const detalle = captura('detalle', lang);
       <Image class="logo" src={logo} alt="" aria-hidden="true" width={64} densities={[1, 2]} loading="eager" />
       <h1>
         <span class="linea">{linea1}</span>
-        <span class="linea baja">
-          {/* Imagen tipografica: el mapa de una salida, dentro del titular. */}
-          <span class="pastilla" aria-hidden="true">
-            <Image src={detalle.claro} alt="" width={150} densities={[1, 2]} loading="eager" />
-          </span>
-          <span>{linea2}</span>
-        </span>
+        <span class="linea baja">{linea2}</span>
       </h1>
     </div>
 
@@ -83,9 +76,9 @@ const detalle = captura('detalle', lang);
 
   /* Aqui esta la correccion: 64rem a ancho completo, no una columna estrecha. */
   /* Metrica de las dos lineas, calculada, no a ojo:
-     a 4.4rem (70 px) la linea 1 son 26 caracteres ~ 858 px y la linea 2 son
-     la pastilla (2.4em ~ 168 px) mas 21 caracteres ~ 693 px. Las dos caben en
-     los 1024 px del contenedor, asi que el H1 son DOS lineas y no tres. */
+     a 4.4rem (70 px) la linea 1 son 26 caracteres ~ 693 px y la linea 2 son
+     21 caracteres ~ 600 px. Las dos caben de sobra en los 1024 px del
+     contenedor, asi que el H1 son DOS lineas y no tres. */
   .titular { max-width: 64rem; }
   h1 {
     font-size: clamp(2.6rem, 4.6vw, 4.4rem);
@@ -93,34 +86,8 @@ const detalle = captura('detalle', lang);
     letter-spacing: -0.035em;
   }
   .linea { display: block; }
-  .baja {
-    color: var(--ink-soft-lg);
-    display: flex;
-    align-items: center;
-    gap: 0.26em;
-    /* Sin wrap: si envuelve, la pastilla cae sola a una linea y se lee roto. */
-    flex-wrap: nowrap;
-  }
-  .baja > span:last-child { min-width: 0; }
+  .baja { color: var(--ink-soft-lg); }
 
-  /* La pastilla: un trozo de la app metido dentro del texto. */
-  .pastilla {
-    display: inline-block;
-    width: 2.4em;
-    height: 1.08em;
-    border-radius: 999px;
-    overflow: hidden;
-    flex: none;
-    box-shadow: inset 0 0 0 1px var(--card-border);
-    transform: translateY(-0.04em);
-  }
-  .pastilla :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 50% 26%;
-    filter: contrast(1.06);
-  }
 
   /* Una sola columna: en dos, la entradilla se queda en 380 px y sale un
      parrafo de cuatro lineas, que es justo lo que no queremos. */
@@ -163,8 +130,5 @@ const detalle = captura('detalle', lang);
     .pie { grid-template-columns: 1fr; gap: 26px; align-items: start; }
     .flota { display: flex; justify-content: center; margin-top: 40px; }
   }
-  @media (max-width: 560px) {
-    .baja { gap: 0.2em; }
-    .pastilla { width: 2.2em; }
-  }
+
 </style>

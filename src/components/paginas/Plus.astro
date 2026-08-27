@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Icono from '../Icono.astro';
+import AcordeonPlus from '../AcordeonPlus.astro';
 import AppStoreBadge from '../AppStoreBadge.astro';
 import InkSplash from '../ink/InkSplash.astro';
 import { funciones, paginaPlus } from '../../data/plus';
@@ -51,14 +51,8 @@ const jsonld = {
   </section>
 
   <section class="lista">
-    <div class="envoltorio rejilla">
-      {funciones.map((f) => (
-        <article class="tarjeta revelar">
-          <Icono nombre={f.icono} />
-          <h2>{f[lang].titulo}</h2>
-          <p>{f[lang].detalle}</p>
-        </article>
-      ))}
+    <div class="envoltorio">
+      <AcordeonPlus lang={lang} />
     </div>
   </section>
 

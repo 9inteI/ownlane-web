@@ -1,0 +1,138 @@
+---
+/* Acordeon horizontal: nueve lamas verticales que se abren al pasar por encima.
+ *
+ * Se apoya en :hover / :focus-within y grid-template-columns, sin JS: el estado
+ * abierto es CSS puro, asi que funciona con el teclado y sin scripts. Cada lama
+ * es un <button> con aria-expanded para que un lector de pantalla sepa que hay
+ * algo que desplegar; el detalle esta SIEMPRE en el DOM, nunca oculto a la
+ * accesibilidad, solo recortado visualmente.
+ *
+ * Por debajo de 900 px un acordeon horizontal no cabe: pasa a lista vertical.
+ */
+import Icono from './Icono.astro';
+import { funciones } from '../data/plus';
+import type { Idioma } from '../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+---
+<div class="acordeon">
+  {funciones.map((f, i) => (
+    <section class="lama" style={`--i:${i}`}>
+      <button class="disparador" type="button" aria-expanded="false">
+        <span class="vertical">{f[lang].corto}</span>
+      </button>
+      <div class="panel">
+        <Icono nombre={f.icono} tam={20} />
+        <h3>{f[lang].titulo}</h3>
+        <p>{f[lang].detalle}</p>
+      </div>
+    </section>
+  ))}
+</div>
+
+<script is:inline>
+  /* El CSS abre la lama; esto solo mantiene aria-expanded en sincronia y
+     permite abrirla con Enter en el movil, donde no hay hover. */
+  document.querySelectorAll('.acordeon .lama').forEach((lama) => {
+    const boton = lama.querySelector('.disparador');
+    if (!boton) return;
+    const marcar = (v) => boton.setAttribute('aria-expanded', String(v));
+    lama.addEventListener('pointerenter', () => marcar(true));
+    lama.addEventListener('pointerleave', () => marcar(false));
+    boton.addEventListener('focus', () => marcar(true));
+    boton.addEventListener('blur', () => marcar(false));
+    boton.addEventListener('click', () => {
+      const abierta = lama.classList.toggle('fijada');
+      marcar(abierta);
+      lama.parentElement?.querySelectorAll('.fijada').forEach((o) => {
+        if (o !== lama) o.classList.remove('fijada');
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Flex, no grid: con flex-grow la lama activa se lleva el espacio de las
+     demas en una sola propiedad animable, y no hace falta :has para nada. */
+  .acordeon {
+    display: flex;
+    gap: 8px;
+    height: 460px;
+  }
+
+  .lama {
+    position: relative;
+    overflow: hidden;
+    flex: 1 1 0;
+    min-width: 62px;
+    border-radius: var(--radius-card);
+    background: var(--card);
+    border: 0.5px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    transition: flex-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .lama:hover,
+  .lama:focus-within,
+  .lama.fijada { flex-grow: 5; }
+
+  .disparador {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: 18px 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+    z-index: 2;
+    transition: opacity 0.3s ease-out;
+  }
+  .vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 26px;
+    opacity: 0;
+    /* Recortado visualmente, no oculto: sigue en el arbol de accesibilidad. */
+    transition: opacity 0.35s ease-out;
+    pointer-events: none;
+  }
+  .panel h3 { font-size: 21px; font-weight: 600; letter-spacing: -0.015em; }
+  .panel p { font-size: 16px; color: var(--ink-soft); max-width: 34ch; }
+
+  .lama:hover .disparador,
+  .lama:focus-within .disparador,
+  .lama.fijada .disparador { opacity: 0; pointer-events: none; }
+  .lama:hover .panel,
+  .lama:focus-within .panel,
+  .lama.fijada .panel { opacity: 1; }
+
+  @media (max-width: 900px) {
+    .acordeon { grid-auto-flow: row; grid-auto-columns: auto; height: auto; gap: 12px; }
+    .disparador { display: none; }
+    .panel { position: static; opacity: 1; pointer-events: auto; padding: 24px; }
+    .lama { min-width: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lama, .disparador, .panel, .acordeon { transition: none; }
+  }
+</style>

@@ -7,8 +7,10 @@
 export interface Funcion {
   id: string;
   icono: string;
-  es: { titulo: string; detalle: string };
-  en: { titulo: string; detalle: string };
+  /** `corto` es el rotulo de la lama cerrada del acordeon: en vertical, el
+   *  titulo entero no cabe en 460 px de alto y se corta por arriba. */
+  es: { titulo: string; corto: string; detalle: string };
+  en: { titulo: string; corto: string; detalle: string };
 }
 
 export const funciones: Funcion[] = [
@@ -17,10 +19,12 @@ export const funciones: Funcion[] = [
     icono: 'fuerza',
     es: {
       titulo: 'Fuerza guiada, dos veces por semana',
+      corto: 'Fuerza',
       detalle: 'Menos de veinte minutos, sin material, con temporizador y descansos contados. Es lo que más baja el riesgo de lesión: casi a la mitad.',
     },
     en: {
       titulo: 'Guided strength, twice a week',
+      corto: 'Strength',
       detalle: "Under twenty minutes, no equipment, with a timer and counted rests. It's what lowers injury risk most: by almost half.",
     },
   },
@@ -29,10 +33,12 @@ export const funciones: Funcion[] = [
     icono: 'movilidad',
     es: {
       titulo: 'Calentar y volver a la calma',
+      corto: 'Calentar y enfriar',
       detalle: 'Cinco minutos guiados antes y cinco después, cronometrados. Movimiento antes de correr y estiramiento después, que es el orden que funciona y no el que hace todo el mundo.',
     },
     en: {
       titulo: 'Warm up and cool down',
+      corto: 'Warm up, cool down',
       detalle: 'Five guided minutes before and five after, timed. Movement before running and stretching after, which is the order that works and not the one everyone uses.',
     },
   },
@@ -41,10 +47,12 @@ export const funciones: Funcion[] = [
     icono: 'carrera',
     es: {
       titulo: 'El día de la carrera',
+      corto: 'El día de la carrera',
       detalle: 'Tu ritmo kilómetro a kilómetro sacado de lo que ya has corrido, qué comer, cuánto beber y qué hacer si va mal.',
     },
     en: {
       titulo: 'Race day',
+      corto: 'Race day',
       detalle: "Your pace kilometre by kilometre drawn from what you've already run, what to eat, how much to drink and what to do if it goes wrong.",
     },
   },
@@ -53,10 +61,12 @@ export const funciones: Funcion[] = [
     icono: 'lectura',
     es: {
       titulo: 'La lectura de cada salida',
+      corto: 'La lectura',
       detalle: 'Qué significa que te frenaras al final y qué hacer la próxima vez. No los números: lo que dicen.',
     },
     en: {
       titulo: 'The read on every run',
+      corto: 'The read',
       detalle: 'What it means that you slowed at the end and what to do next time. Not the numbers: what they say.',
     },
   },
@@ -65,10 +75,12 @@ export const funciones: Funcion[] = [
     icono: 'informe',
     es: {
       titulo: 'El informe del mes',
+      corto: 'El informe del mes',
       detalle: 'Cada mes, si estás mejorando de verdad: cuánto avanzas por cada latido. El ritmo sube con un buen día; esto no.',
     },
     en: {
       titulo: 'The monthly report',
+      corto: 'Monthly report',
       detalle: "Every month, whether you're really improving: how far you go per heartbeat. Pace rises with a good day; this doesn't.",
     },
   },
@@ -77,10 +89,12 @@ export const funciones: Funcion[] = [
     icono: 'rutas',
     es: {
       titulo: 'Tus rutas, comparadas',
+      corto: 'Rutas comparadas',
       detalle: 'Cuando repites un recorrido, la app lo reconoce sola y te dice qué tal ha ido comparado con las otras veces que lo hiciste.',
     },
     en: {
       titulo: 'Your routes, compared',
+      corto: 'Routes compared',
       detalle: 'When you repeat a route, the app recognises it on its own and tells you how it went compared with the other times you did it.',
     },
   },
@@ -89,10 +103,12 @@ export const funciones: Funcion[] = [
     icono: 'marcas',
     es: {
       titulo: 'Tus marcas',
+      corto: 'Tus marcas',
       detalle: 'Tu mejor kilómetro, tu mejor 5K y tu mejor 10K, tu salida más larga y tus semanas seguidas sin fallar. Contra nadie más que contra ti.',
     },
     en: {
       titulo: 'Your bests',
+      corto: 'Your bests',
       detalle: 'Your best kilometre, your best 5K and your best 10K, your longest run and your streak of weeks without missing. Against nobody but yourself.',
     },
   },
@@ -101,10 +117,12 @@ export const funciones: Funcion[] = [
     icono: 'pulso',
     es: {
       titulo: 'Pulsaciones y esfuerzo',
+      corto: 'Pulsaciones',
       detalle: 'La gráfica del pulso de la salida y si el esfuerzo que sentiste cuadra con él.',
     },
     en: {
       titulo: 'Heart rate and effort',
+      corto: 'Heart rate',
       detalle: 'The heart rate graph for the run and whether the effort you felt matches it.',
     },
   },
@@ -113,10 +131,12 @@ export const funciones: Funcion[] = [
     icono: 'meta',
     es: {
       titulo: 'La siguiente meta',
+      corto: 'La siguiente meta',
       detalle: 'Tu primer plan entero es gratis. Cuando lo termines y quieras otra meta, ahí entra Plus.',
     },
     en: {
       titulo: 'Your next goal',
+      corto: 'Your next goal',
       detalle: "Your first full plan is free. When you finish it and want another goal, that's where Plus comes in.",
     },
   },

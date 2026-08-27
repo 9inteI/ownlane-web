@@ -61,7 +61,18 @@
       document.querySelectorAll<HTMLElement>('[data-horizontal]').forEach((zona) => {
         const via = zona.querySelector<HTMLElement>('[data-via]');
         if (!via) return;
-        const recorrido = () => Math.max(0, via.scrollWidth - zona.clientWidth + 48);
+        const carril = via.parentElement;
+        if (!carril) return;
+
+        // El recorrido se mide contra la ventana VISIBLE del carril, no contra
+        // el ancho de la seccion. El carril arranca dentro de la columna
+        // derecha —a unos 600 px del borde—, asi que usando zona.clientWidth el
+        // recorrido salia 576 px corto y las dos ultimas tarjetas no llegaban a
+        // entrar nunca en pantalla antes de que la seccion se despegara.
+        const recorrido = () => {
+          const ventana = zona.getBoundingClientRect().right - carril.getBoundingClientRect().left;
+          return Math.max(0, via.scrollWidth - ventana + 24);
+        };
         gsap.to(via, {
           x: () => -recorrido(),
           ease: 'none',
