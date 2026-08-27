@@ -1,0 +1,44 @@
+---
+/* Porta la regla central de OwnLane/Features/Learn/EvidenceBadge.swift:
+ * la jerarquia se codifica por RELLENO, no por color. En la app es porque la
+ * paleta es monocroma; en web, ademas, cumple WCAG 1.4.1 sin esfuerzo — el
+ * nivel se distingue en escala de grises y el texto lo dice, no solo el icono. */
+import { t } from '../i18n/ui';
+import type { Idioma } from '../i18n/routes';
+
+interface Props { nivel: 'solid' | 'reasonable' | 'myth'; lang: Idioma; compacto?: boolean; }
+const { nivel, lang, compacto = false } = Astro.props;
+
+const iconos = {
+  solid: 'M12 2l7 3v6c0 4.4-3 8.3-7 9.4-4-1.1-7-5-7-9.4V5zM9 11.5l2 2 4-4',
+  reasonable: 'M12 2l7 3v6c0 4.4-3 8.3-7 9.4-4-1.1-7-5-7-9.4V5zM12 7.5v5M12 15.5v.5',
+  myth: 'M12 2l7 3v6c0 4.4-3 8.3-7 9.4-4-1.1-7-5-7-9.4V5zM9.5 9.5l5 5M14.5 9.5l-5 5',
+};
+const etiqueta = t(lang)(`evidencia.${nivel}` as 'evidencia.solid');
+---
+<span class:list={['insignia', nivel, { compacto }]}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    {iconos[nivel].split(' M').map((p, i) => <path d={i === 0 ? p : `M${p}`} />)}
+  </svg>
+  {etiqueta}
+</span>
+
+<style>
+  .insignia {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .compacto { font-size: 11px; padding: 5px 9px; gap: 5px; }
+  svg { width: 1.05em; height: 1.05em; flex: none; }
+
+  .solid { background: var(--tint); color: var(--on-tint); }
+  .reasonable { background: var(--fill-3); color: var(--ink); }
+  .myth { background: transparent; color: var(--ink-soft); box-shadow: inset 0 0 0 1px var(--line-1); }
+</style>

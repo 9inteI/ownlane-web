@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import EvidenceBadge from '../EvidenceBadge.astro';
+import InkSplash from '../ink/InkSplash.astro';
+import { t } from '../../i18n/ui';
+import { rutaArticulo, type Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const tr = t(lang);
+
+const todos = (await getCollection('aprende', (a) => a.data.lang === lang)).sort(
+  (a, b) => a.data.title.localeCompare(b.data.title)
+);
+
+const c = {
+  es: {
+    titulo: 'Own Lane · Aprende',
+    descripcion: 'Artículos sobre correr con sus fuentes citadas, y una etiqueta que dice cuánto respaldo tiene cada cosa. Incluido lo que no lo tiene.',
+    eyebrow: 'Aprende',
+    h1: 'Lo que está demostrado, y lo que solo se repite',
+    entradilla: 'Cada artículo lleva sus fuentes al pie y una etiqueta que dice cuánto respaldo tiene. Incluidas las cosas que todo el mundo repite y no tienen ninguno.',
+    categorias: { technique: 'Técnica', breathing: 'Respiración', gear: 'Material', injuries: 'Lesiones', training: 'Entrenamiento' },
+  },
+  en: {
+    titulo: 'Own Lane · Learn',
+    descripcion: "Articles about running with their sources cited, and a label saying how much backing each claim has. Including the ones that have none.",
+    eyebrow: 'Learn',
+    h1: "What's proven, and what just gets repeated",
+    entradilla: 'Every article cites its sources and carries a label saying how much backing it has. Including the things everyone repeats that have none.',
+    categorias: { technique: 'Technique', breathing: 'Breathing', gear: 'Gear', injuries: 'Injuries', training: 'Training' },
+  },
+}[lang];
+---
+<Base lang={lang} pagina="aprende" titulo={c.titulo} descripcion={c.descripcion}>
+  <section class="cabecera">
+    <InkSplash variante={2} opacidad={0.07} tam="min(440px, 62vw)" estilo="top:-110px;right:-150px" />
+    <div class="envoltorio">
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h1>{c.h1}</h1>
+      <p class="entradilla">{c.entradilla}</p>
+    </div>
+  </section>
+
+  <div class="envoltorio rejilla">
+    {todos.map((a) => (
+      <article class="tarjeta ficha revelar">
+        <a class="enlace" href={rutaArticulo(a.data.slug, lang)}>
+          <span class="sr">{a.data.title}</span>
+        </a>
+        <div class="alto">
+          <EvidenceBadge nivel={a.data.evidence} lang={lang} compacto />
+          <span class="meta">{c.categorias[a.data.category]} · {a.data.minutes} {tr('articulo.minutos')}</span>
+        </div>
+        <h2>{a.data.title}</h2>
+        <p>{a.data.teaser}</p>
+      </article>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .cabecera { position: relative; overflow: clip; padding: 60px 0 12px; }
+  h1 { margin: 14px 0 16px; max-width: 20ch; }
+  .entradilla { font-size: 19px; color: var(--ink-soft); max-width: 56ch; }
+  .rejilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 20px;
+    padding-top: 36px;
+  }
+  .ficha { position: relative; padding: 24px; transition: var(--press); }
+  .ficha:hover { transform: translateY(-2px); }
+  /* Enlace que cubre la tarjeta: el area de click es toda, pero en el DOM
+     sigue habiendo un solo <a> con texto, que es lo que lee un lector. */
+  .enlace { position: absolute; inset: 0; border-radius: inherit; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .alto { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .meta { font-size: 12px; color: var(--ink-soft); }
+  h2 { font-size: 19px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .ficha p { color: var(--ink-soft); font-size: 16px; }
+</style>

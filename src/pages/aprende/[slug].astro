@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import Articulo from '../../components/paginas/Articulo.astro';
+import { rutaArticulo } from '../../i18n/routes';
+
+export async function getStaticPaths() {
+  const todos = await getCollection('aprende');
+  const es = todos.filter((a) => a.data.lang === 'es');
+  return es.map((articulo) => {
+    // El hreflang de un articulo apunta a SU traduccion, no al indice.
+    const gemelo = todos.find(
+      (o) => o.data.lang === 'en' && o.data.translationKey === articulo.data.translationKey
+    );
+    return {
+      params: { slug: articulo.data.slug },
+      props: {
+        articulo,
+        alternas: {
+          es: rutaArticulo(articulo.data.slug, 'es'),
+          en: gemelo ? rutaArticulo(gemelo.data.slug, 'en') : '/en/learn',
+        },
+      },
+    };
+  });
+}
+
+const { articulo, alternas } = Astro.props;
+---
+
+<Articulo articulo={articulo} lang="es" alternas={alternas} />

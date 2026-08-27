@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import Articulo from '../../../components/paginas/Articulo.astro';
+import { rutaArticulo } from '../../../i18n/routes';
+
+export async function getStaticPaths() {
+  const todos = await getCollection('aprende');
+  const en = todos.filter((a) => a.data.lang === 'en');
+  return en.map((articulo) => {
+    const gemelo = todos.find(
+      (o) => o.data.lang === 'es' && o.data.translationKey === articulo.data.translationKey
+    );
+    return {
+      params: { slug: articulo.data.slug },
+      props: {
+        articulo,
+        alternas: {
+          es: gemelo ? rutaArticulo(gemelo.data.slug, 'es') : '/aprende',
+          en: rutaArticulo(articulo.data.slug, 'en'),
+        },
+      },
+    };
+  });
+}
+
+const { articulo, alternas } = Astro.props;
+---
+
+<Articulo articulo={articulo} lang="en" alternas={alternas} />

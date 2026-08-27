@@ -1,0 +1,143 @@
+---
+/* Las tres figuras de OwnLane/Features/Learn/ArticleFigures.swift, portadas.
+ * Son barras, lineas y marcas: HTML y CSS bastan, y asi escalan con el texto
+ * y se leen en escala de grises igual que en la app. */
+import { idiomaDe } from '../i18n/routes';
+
+interface Props { nombre: 'talkTest' | 'cadence' | 'loadJump'; pie: string; }
+const { nombre, pie } = Astro.props;
+const lang = idiomaDe(Astro.url);
+
+const textos = {
+  es: {
+    zonas: [
+      ['Puedes cantar', 'Demasiado suave'],
+      ['Puedes hablar', 'Aquí'],
+      ['Frases cortas', 'Duro'],
+      ['No puedes', 'Máximo'],
+    ],
+    cadencia: [
+      ['160 pasos/min', 'zancada larga'],
+      ['175 pasos/min', 'zancada corta'],
+    ],
+    riesgo: 'Riesgo de lesión',
+    subidas: [['+5 %', 'subida semanal moderada'], ['+30 %', 'subida de golpe']],
+  },
+  en: {
+    zonas: [
+      ['You can sing', 'Too easy'],
+      ['You can talk', 'Here'],
+      ['Short sentences', 'Hard'],
+      ["You can't", 'Maximum'],
+    ],
+    cadencia: [
+      ['160 steps/min', 'long stride'],
+      ['175 steps/min', 'short stride'],
+    ],
+    riesgo: 'Injury risk',
+    subidas: [['+5%', 'moderate weekly increase'], ['+30%', 'a sudden jump']],
+  },
+}[lang];
+---
+<figure class="figura">
+  {nombre === 'talkTest' && (
+    <div class="talk">
+      <div class="tramos">
+        {textos.zonas.map((_, i) => (
+          <div class="tramo" style={`--op:${0.12 + i * 0.26}`}>
+            {i === 1 && <span class="marca" aria-hidden="true"></span>}
+          </div>
+        ))}
+      </div>
+      <div class="etiquetas">
+        {textos.zonas.map(([a, b], i) => (
+          <div class:list={['etiqueta', { aqui: i === 1 }]}>
+            <span class="fuerte">{a}</span>
+            <span class="flojo">{b}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {nombre === 'cadence' && (
+    <div class="cadencia">
+      {textos.cadencia.map(([titulo, detalle], fila) => (
+        <div class:list={['fila', { destacada: fila === 1 }]}>
+          <div class="pasos" aria-hidden="true">
+            {Array.from({ length: fila === 0 ? 7 : 9 }).map(() => <span class="paso"></span>)}
+          </div>
+          <div class="texto">
+            <strong>{titulo}</strong> <span class="flojo">· {detalle}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {nombre === 'loadJump' && (
+    <div class="carga">
+      <div class="eje">{textos.riesgo}</div>
+      <svg viewBox="0 0 300 96" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="0" y1="95" x2="300" y2="95" stroke="currentColor" stroke-opacity="0.14" />
+        <path d="M4 86 C60 84 110 80 150 74 C186 68 214 58 236 40 C252 26 264 14 274 8"
+              fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+        <circle cx="150" cy="74" r="4.5" fill="currentColor" opacity="0.35" />
+        <circle cx="274" cy="8" r="5" fill="currentColor" />
+      </svg>
+      <div class="marcas">
+        {textos.subidas.map(([n, d], i) => (
+          <div class:list={['hito', { fin: i === 1 }]}>
+            <span class="num">{n}</span>
+            <span class="flojo">{d}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <figcaption>{pie}</figcaption>
+</figure>
+
+<style>
+  .figura { margin: 1.9em 0; }
+  figcaption { margin-top: 14px; font-size: 14px; color: var(--ink-soft); }
+  .flojo { color: var(--ink-soft); opacity: 0.75; }
+
+  .tramos { display: flex; gap: 3px; padding-top: 16px; }
+  .tramo {
+    position: relative;
+    flex: 1;
+    height: 26px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--ink) calc(var(--op) * 100%), transparent);
+  }
+  .marca {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .etiquetas { display: flex; gap: 3px; margin-top: 10px; }
+  .etiqueta { flex: 1; display: grid; gap: 2px; text-align: center; font-size: 11px; color: var(--ink-soft); }
+  .etiqueta .fuerte { font-size: 12px; }
+  .aqui .fuerte { color: var(--ink); font-weight: 600; }
+
+  .cadencia { display: grid; gap: 18px; }
+  .pasos { display: flex; gap: 6px; align-items: flex-end; height: 20px; }
+  .paso { flex: 1; height: 8px; border-radius: 2px; background: var(--bar); }
+  .destacada .paso { height: 14px; background: var(--ink); }
+  .cadencia .texto { margin-top: 7px; font-size: 13px; }
+
+  .carga { color: var(--ink); }
+  .carga .eje { font-size: 11px; color: var(--ink-soft); margin-bottom: 6px; }
+  .carga svg { width: 100%; height: 96px; display: block; }
+  .marcas { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; }
+  .hito { display: grid; gap: 1px; }
+  .hito.fin { text-align: right; }
+  .num { font-weight: 600; font-size: 12px; font-variant-numeric: tabular-nums; }
+</style>

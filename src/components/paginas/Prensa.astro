@@ -1,0 +1,205 @@
+---
+import Base from '../../layouts/Base.astro';
+import { Image } from 'astro:assets';
+import InkSplash from '../ink/InkSplash.astro';
+import { APP } from '../../data/app';
+import { ruta, type Idioma } from '../../i18n/routes';
+import logo from '../../assets/brand/ownlane-logo.png';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+
+const c = {
+  es: {
+    titulo: 'Own Lane · Prensa',
+    descripcion: 'Ficha, logotipo, capturas y textos de Own Lane para quien escriba sobre la app.',
+    eyebrow: 'Prensa',
+    h1: 'Kit de marca',
+    entradilla: 'Todo lo que hace falta para escribir sobre Own Lane. Si necesitas algo que no esté aquí, escríbeme.',
+    fichaTitulo: 'La ficha',
+    ficha: [
+      ['Nombre', 'Own Lane'],
+      ['Qué es', 'App de running para principiantes, iOS y Apple Watch'],
+      ['Idiomas', 'Español e inglés'],
+      ['Precio', 'Gratis, con suscripción opcional (49 €/año o 4,99 €/mes)'],
+      ['App Store ID', APP.appStoreId],
+      ['Bundle ID', APP.bundleId],
+      ['Contacto', APP.email],
+    ],
+    textoTitulo: 'Descripción, para copiar',
+    corto: 'Own Lane es una app de running para quien empieza desde cero. Su plan se recoloca cuando fallas un día y sube o baja según cómo te hayas sentido, no según lo que midió el reloj. No tiene feed, ni cuenta, ni servidor: no contiene ni una sola llamada de red.',
+    largo: 'Solo una de cada cuatro personas termina un plan de iniciación, y casi todas lo dejan entre la segunda y la quinta semana por una progresión demasiado agresiva o por una lesión. Own Lane está construida alrededor de ese problema: al terminar cada salida pregunta cómo te has sentido y ajusta el plan con esa respuesta. Está disponible en el App Store para iPhone y Apple Watch, en español y en inglés.',
+    copiar: 'Copiar',
+    copiado: 'Copiado',
+    marcaTitulo: 'Uso de la marca',
+    marca: [
+      'El logotipo es una mancha de tinta. No lo gires, no lo recolorees y no lo pongas dentro de otra forma.',
+      'Deja alrededor un espacio libre de al menos la mitad de su ancho.',
+      'Sobre fondo claro, en negro. Sobre fondo oscuro, en blanco. Nunca sobre una foto.',
+      'El nombre se escribe «Own Lane», dos palabras, ambas con mayúscula inicial.',
+    ],
+    descargaTitulo: 'Descargas',
+    logoDescarga: 'Logotipo (PNG, 2508 × 2508)',
+    capturasNota: 'Para capturas a resolución completa o material que no esté aquí, escríbeme y te lo mando.',
+  },
+  en: {
+    titulo: 'Own Lane · Press',
+    descripcion: 'Fact sheet, logo, screenshots and copy for anyone writing about Own Lane.',
+    eyebrow: 'Press',
+    h1: 'Brand kit',
+    entradilla: 'Everything you need to write about Own Lane. If you need something that is not here, write to me.',
+    fichaTitulo: 'Fact sheet',
+    ficha: [
+      ['Name', 'Own Lane'],
+      ['What it is', 'Beginner running app for iOS and Apple Watch'],
+      ['Languages', 'Spanish and English'],
+      ['Price', 'Free, with an optional subscription (€49/year or €4.99/month)'],
+      ['App Store ID', APP.appStoreId],
+      ['Bundle ID', APP.bundleId],
+      ['Contact', APP.email],
+    ],
+    textoTitulo: 'Boilerplate, to copy',
+    corto: 'Own Lane is a running app for people starting from zero. Its plan reschedules when you miss a day and steps up or down depending on how the session felt, not on what the watch measured. It has no feed, no account and no server: it does not contain a single network call.',
+    largo: 'Only one in four people finishes a beginner running plan, and most stop between the second and fifth week because of a progression that was too aggressive or an injury. Own Lane is built around that problem: at the end of every run it asks how it felt and adjusts the plan with that answer. It is available on the App Store for iPhone and Apple Watch, in Spanish and English.',
+    copiar: 'Copy',
+    copiado: 'Copied',
+    marcaTitulo: 'Using the brand',
+    marca: [
+      'The logo is an ink splash. Do not rotate it, do not recolour it and do not place it inside another shape.',
+      'Leave clear space around it of at least half its width.',
+      'Black on light backgrounds. White on dark ones. Never over a photo.',
+      'The name is written "Own Lane", two words, both capitalised.',
+    ],
+    descargaTitulo: 'Downloads',
+    logoDescarga: 'Logo (PNG, 2508 × 2508)',
+    capturasNota: 'For full-resolution screenshots or anything not listed here, write to me and I will send it.',
+  },
+}[lang];
+---
+<Base lang={lang} pagina="prensa" titulo={c.titulo} descripcion={c.descripcion}>
+  <section class="cabecera">
+    <InkSplash variante={3} opacidad={0.07} tam="min(420px, 60vw)" estilo="top:-100px;right:-140px" />
+    <div class="envoltorio">
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h1>{c.h1}</h1>
+      <p class="entradilla">{c.entradilla}</p>
+    </div>
+  </section>
+
+  <div class="envoltorio bloques">
+    <section>
+      <h2>{c.fichaTitulo}</h2>
+      <dl class="tarjeta ficha">
+        {c.ficha.map(([k, v]) => (
+          <div class="fila">
+            <dt>{k}</dt>
+            <dd>{k === 'Contacto' || k === 'Contact' ? <a href={`mailto:${v}`}>{v}</a> : v}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section>
+      <h2>{c.textoTitulo}</h2>
+      <div class="tarjeta texto">
+        <p data-copiable>{c.corto}</p>
+        <button class="copiar" type="button" data-copiar data-hecho={c.copiado}>{c.copiar}</button>
+      </div>
+      <div class="tarjeta texto">
+        <p data-copiable>{c.largo}</p>
+        <button class="copiar" type="button" data-copiar data-hecho={c.copiado}>{c.copiar}</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>{c.descargaTitulo}</h2>
+      <div class="tarjeta descarga">
+        <Image src={logo} alt="" aria-hidden="true" width={64} densities={[1, 2]} />
+        <div>
+          <p><strong>Own Lane</strong></p>
+          <p class="sutil">{c.logoDescarga}</p>
+        </div>
+        <a class="boton" href="/prensa/ownlane-logo.png" download>PNG</a>
+      </div>
+      <p class="sutil nota">{c.capturasNota}</p>
+    </section>
+
+    <section>
+      <h2>{c.marcaTitulo}</h2>
+      <ul class="reglas">{c.marca.map((r) => <li>{r}</li>)}</ul>
+    </section>
+  </div>
+</Base>
+
+<script is:inline>
+  document.querySelectorAll('[data-copiar]').forEach((boton) => {
+    boton.addEventListener('click', async () => {
+      const texto = boton.parentElement?.querySelector('[data-copiable]')?.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(texto.trim());
+        const antes = boton.textContent;
+        boton.textContent = boton.dataset.hecho;
+        setTimeout(() => { boton.textContent = antes; }, 1800);
+      } catch {
+        // Sin permiso de portapapeles: se selecciona para que se copie a mano.
+        const p = boton.parentElement?.querySelector('[data-copiable]');
+        if (!p) return;
+        const r = document.createRange();
+        r.selectNodeContents(p);
+        const sel = getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(r);
+      }
+    });
+  });
+</script>
+
+<style>
+  .cabecera { position: relative; overflow: clip; padding: 60px 0 8px; }
+  h1 { margin: 14px 0 14px; }
+  .entradilla { font-size: 19px; color: var(--ink-soft); max-width: 52ch; }
+  .bloques { display: grid; gap: 44px; padding-top: 40px; max-width: 780px; }
+  h2 { font-size: 22px; margin-bottom: 16px; }
+
+  .ficha { display: grid; gap: 0; padding: 6px 20px; }
+  .fila { display: grid; grid-template-columns: minmax(120px, 0.42fr) 1fr; gap: 16px; padding: 14px 0; }
+  .fila + .fila { border-top: 0.5px solid var(--separator); }
+  dt { color: var(--ink-soft); font-size: 15px; }
+  dd { margin: 0; }
+
+  .texto { position: relative; padding: 22px 24px; }
+  .texto + .texto { margin-top: 14px; }
+  .texto p { padding-right: 84px; }
+  .copiar {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 0;
+    background: var(--fill-3);
+    color: var(--ink);
+    cursor: pointer;
+    transition: var(--press);
+  }
+  .copiar:active { transform: scale(0.965); }
+
+  .descarga { display: flex; align-items: center; gap: 16px; padding: 18px 20px; }
+  .descarga :global(img) { border-radius: 14px; }
+  .descarga p { font-size: 15px; }
+  .boton {
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: var(--tint);
+    color: var(--on-tint);
+    text-decoration: none;
+  }
+  .nota { margin-top: 12px; font-size: 14px; }
+  .reglas { margin: 0; padding-left: 1.2em; display: grid; gap: 10px; color: var(--ink-soft); }
+</style>

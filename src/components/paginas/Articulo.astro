@@ -1,0 +1,102 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import EvidenceBadge from '../EvidenceBadge.astro';
+import InkSplash from '../ink/InkSplash.astro';
+import { t } from '../../i18n/ui';
+import { ruta, rutaArticulo, type Idioma } from '../../i18n/routes';
+import { APP } from '../../data/app';
+
+interface Props {
+  articulo: CollectionEntry<'aprende'>;
+  lang: Idioma;
+  alternas: { es: string; en: string };
+}
+const { articulo, lang, alternas } = Astro.props;
+// Content Layer de Astro 5: render(entry), no entry.render().
+const { Content } = await render(articulo);
+const d = articulo.data;
+const tr = t(lang);
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: d.title,
+  description: d.teaser,
+  inLanguage: lang,
+  dateModified: d.updated.toISOString().slice(0, 10),
+  author: { '@type': 'Organization', name: APP.nombre },
+  publisher: { '@type': 'Organization', name: APP.nombre },
+  // Lo que hace legible por maquinas la promesa de evidencia.
+  citation: d.sources.map((s) => ({
+    '@type': 'ScholarlyArticle',
+    name: s.title,
+    author: s.authors,
+    isPartOf: s.publication,
+    datePublished: String(s.year),
+    url: s.url,
+  })),
+};
+
+const fecha = new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-GB', {
+  day: 'numeric', month: 'long', year: 'numeric',
+}).format(d.updated);
+---
+<Base
+  lang={lang}
+  titulo={`${d.title} · Own Lane`}
+  descripcion={d.teaser}
+  alternas={alternas}
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonld)} />
+
+  <div class="marco">
+    <InkSplash variante={1} opacidad={0.06} tam="min(400px, 58vw)" suave estilo="top:-80px;right:-150px" />
+    <div class="envoltorio-texto">
+      <p class="volver"><a href={ruta('aprende', lang)}>← {tr('nav.aprende')}</a></p>
+
+      <header class="cabecera">
+        <!-- El nivel de evidencia va ARRIBA, como en ArticleView.swift:
+             saber si algo esta demostrado cambia como lees lo que viene. -->
+        <EvidenceBadge nivel={d.evidence} lang={lang} />
+        <h1>{d.title}</h1>
+        <p class="entradilla sutil">{d.teaser}</p>
+        <p class="meta sutil">{d.minutes} {tr('articulo.minutos')} · {tr('articulo.actualizado')} {fecha}</p>
+      </header>
+
+      <div class="prosa cuerpo">
+        <Content />
+      </div>
+
+      <section class="fuentes">
+        <h2>{tr('articulo.fuentes')}</h2>
+        <ol>
+          {d.sources.map((s) => (
+            <li>
+              <a href={s.url} rel="noopener nofollow" target="_blank">{s.title}</a>
+              <span class="sutil"> — {s.authors}. <i>{s.publication}</i>, {s.year}.</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .marco { position: relative; overflow: clip; padding-bottom: 24px; }
+  .volver { padding-top: 40px; font-size: 14px; }
+  .volver a { color: var(--ink-soft); text-decoration: none; }
+  .volver a:hover { color: var(--ink); }
+  .cabecera { padding: 22px 0 30px; }
+  h1 { margin: 18px 0 12px; font-size: clamp(30px, 5vw, 44px); }
+  .entradilla { font-size: 19px; max-width: 50ch; }
+  .meta { margin-top: 12px; font-size: 13px; }
+  .cuerpo { font-size: 17px; }
+  .cuerpo :global(h2) { font-size: 22px; }
+
+  .fuentes { margin-top: 56px; padding-top: 26px; border-top: 0.5px solid var(--separator); }
+  .fuentes h2 { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+  .fuentes ol { margin: 16px 0 0; padding-left: 1.3em; display: grid; gap: 12px; font-size: 15px; }
+  .fuentes a { color: var(--ink); }
+</style>

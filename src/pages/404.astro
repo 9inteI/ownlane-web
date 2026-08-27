@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Splatter from '../components/ink/Splatter.astro';
+import { ruta, idiomaDe } from '../i18n/routes';
+
+// El 404 lo sirve el host para cualquier ruta, asi que el idioma sale del
+// camino que se pidio, no de la ruta de este fichero.
+const lang = idiomaDe(Astro.url);
+const c = {
+  es: { h1: 'Aquí no hay nada', p: 'Esta página no existe, o ya no. Vuelve al principio.', b: 'Ir al inicio' },
+  en: { h1: 'Nothing here', p: 'This page does not exist, or no longer does. Head back to the start.', b: 'Go to the home page' },
+}[lang];
+---
+<Base lang={lang} titulo="404 · Own Lane" descripcion={c.p} alternas={{ es: '/', en: '/en' }}>
+  <section class="cuatro">
+    <Splatter variante={2} tam="min(520px, 76vw)" opacidad={0.1} brillo estilo="top:-120px;left:50%;--tx:-50%" />
+    <div class="envoltorio centro">
+      <p class="num">404</p>
+      <h1>{c.h1}</h1>
+      <p class="texto">{c.p}</p>
+      <a class="boton" href={ruta('home', lang)}>{c.b}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .cuatro { position: relative; overflow: clip; padding: 110px 0 90px; text-align: center; }
+  .centro { display: grid; justify-items: center; }
+  .num { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: var(--ink-soft); }
+  h1 { margin: 14px 0 12px; }
+  .texto { color: var(--ink-soft); max-width: 40ch; }
+  .boton {
+    margin-top: 28px;
+    min-height: var(--pill-height);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 28px;
+    border-radius: 999px;
+    background: var(--tint);
+    color: var(--on-tint);
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--glow);
+    transition: var(--press);
+  }
+  .boton:active { transform: scale(0.965); opacity: 0.86; }
+</style>

@@ -1,0 +1,17 @@
+---
+/* La frase que resume el articulo. En la app es un bloque de tinta invertido. */
+---
+<aside class="destacado"><slot /></aside>
+<style>
+  .destacado {
+    margin: 1.8em 0;
+    padding: 22px 24px;
+    border-radius: var(--radius-card);
+    background: var(--inverse-surface);
+    color: var(--inverse-ink);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+</style>

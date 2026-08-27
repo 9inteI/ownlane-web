@@ -1,0 +1,85 @@
+---
+import Prose from '../../layouts/Prose.astro';
+import FaqItem from '../FaqItem.astro';
+import { faq } from '../../data/faq';
+import { APP } from '../../data/app';
+import type { Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+
+const txt = {
+  es: {
+    titulo: 'Own Lane · Soporte',
+    descripcion: 'Ayuda y contacto de Own Lane, la app para empezar a correr sin red social.',
+    h1: 'Soporte',
+    entradilla: 'Una app para empezar a correr y seguir corriendo. Sin feed, sin kudos, sin nadie mirándote.',
+    ayuda: '¿Necesitas ayuda?',
+    escribe: 'Escribe a',
+    quien: 'Contesto yo, no un formulario. Suele tardar un par de días.',
+    preguntas: 'Preguntas habituales',
+    aviso: 'Aviso',
+    avisoTexto:
+      'Own Lane no sustituye a un médico ni a un fisioterapeuta. Si algo te duele, para y consúltalo. Los días de descanso del plan no son opcionales.',
+  },
+  en: {
+    titulo: 'Own Lane · Support',
+    descripcion: 'Help and contact for Own Lane, the app for starting to run without a social network.',
+    h1: 'Support',
+    entradilla: 'An app for starting to run and carrying on. No feed, no kudos, nobody watching.',
+    ayuda: 'Need help?',
+    escribe: 'Write to',
+    quien: 'I answer, not a form. It usually takes a couple of days.',
+    preguntas: 'Common questions',
+    aviso: 'Notice',
+    avisoTexto:
+      'Own Lane is no substitute for a doctor or a physiotherapist. If something hurts, stop and get it checked. The rest days in the plan are not optional.',
+  },
+} as const;
+
+const c = txt[lang];
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((q) => ({
+    '@type': 'Question',
+    name: q[lang].p,
+    acceptedAnswer: { '@type': 'Answer', text: q[lang].r.join(' ') },
+  })),
+};
+---
+<Prose
+  lang={lang}
+  pagina="soporte"
+  titulo={c.titulo}
+  descripcion={c.descripcion}
+  h1={c.h1}
+  entradilla={c.entradilla}
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonld)} />
+
+  <div class="tarjeta contacto">
+    <p><strong>{c.ayuda}</strong> {c.escribe} <a href={`mailto:${APP.email}`}>{APP.email}</a>.</p>
+    <p class="sutil">{c.quien}</p>
+  </div>
+
+  <h2>{c.preguntas}</h2>
+  <div class="lista">
+    {faq.map((q, i) => (
+      <FaqItem pregunta={q[lang].p} abierto={i === 0}>
+        {q[lang].r.map((parrafo) => <p>{parrafo}</p>)}
+      </FaqItem>
+    ))}
+  </div>
+
+  <h2>{c.aviso}</h2>
+  <div class="tarjeta">
+    <p>{c.avisoTexto}</p>
+  </div>
+</Prose>
+
+<style>
+  .contacto p + p { margin-top: 8px; }
+  .lista { margin-top: 4px; border-top: 0.5px solid var(--separator); }
+</style>

@@ -1,0 +1,41 @@
+---
+import Prose from '../../layouts/Prose.astro';
+import { politica } from '../../data/privacidad';
+import { APP } from '../../data/app';
+import type { Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const c = politica[lang];
+---
+<Prose
+  lang={lang}
+  pagina="privacidad"
+  titulo={c.titulo}
+  descripcion={c.descripcion}
+  h1={c.h1}
+  entradilla={c.fecha}
+>
+  {c.secciones.map((seccion) => (
+    <>
+      {seccion.titulo && <h2>{seccion.titulo}</h2>}
+      {seccion.bloques.map((b) => {
+        if (b.tipo === 'p') return <p>{b.texto}</p>;
+        if (b.tipo === 'p-sutil') return <p class="sutil">{b.texto}</p>;
+        if (b.tipo === 'lista') return <ul>{b.puntos.map((x) => <li>{x}</li>)}</ul>;
+        return (
+          <div class="tarjeta">
+            {b.parrafos.map((x) =>
+              x.fuerte ? <p><strong>{x.texto}</strong></p> : <p class={x.sutil ? 'sutil' : undefined}>{x.texto}</p>
+            )}
+          </div>
+        );
+      })}
+    </>
+  ))}
+
+  <h2>{c.contactoTitulo}</h2>
+  <div class="tarjeta">
+    <p>{c.contactoTexto} <a href={`mailto:${APP.email}`}>{APP.email}</a></p>
+  </div>
+</Prose>
