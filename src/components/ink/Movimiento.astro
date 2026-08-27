@@ -64,15 +64,11 @@
         const carril = via.parentElement;
         if (!carril) return;
 
-        // El recorrido se mide contra la ventana VISIBLE del carril, no contra
-        // el ancho de la seccion. El carril arranca dentro de la columna
-        // derecha —a unos 600 px del borde—, asi que usando zona.clientWidth el
-        // recorrido salia 576 px corto y las dos ultimas tarjetas no llegaban a
-        // entrar nunca en pantalla antes de que la seccion se despegara.
-        const recorrido = () => {
-          const ventana = zona.getBoundingClientRect().right - carril.getBoundingClientRect().left;
-          return Math.max(0, via.scrollWidth - ventana + 24);
-        };
+        // El recorrido se mide contra el ancho del CARRIL, que es la ventana
+        // que de verdad se ve: el carril recorta y arranca dentro de la columna
+        // derecha. Midiendolo contra zona.clientWidth salia 576 px corto y las
+        // dos ultimas tarjetas no llegaban a entrar antes de despegarse.
+        const recorrido = () => Math.max(0, via.scrollWidth - carril.clientWidth + 8);
         gsap.to(via, {
           x: () => -recorrido(),
           ease: 'none',
@@ -81,7 +77,7 @@
             start: 'top top',
             end: () => '+=' + recorrido(),
             pin: true,
-            scrub: 0.6,
+            scrub: 0.35,
             anticipatePin: 1,
             invalidateOnRefresh: true,
           },
