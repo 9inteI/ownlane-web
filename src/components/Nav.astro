@@ -93,17 +93,28 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   .descarga:active { transform: scale(0.965); opacity: 0.86; }
 
-  @media (max-width: 640px) {
-    ul { gap: 14px; }
+  /* Por debajo de 560 no caben marca, tres enlaces, idioma y boton en una
+     fila: se montaban unos encima de otros. Los enlaces bajan a una segunda
+     linea en vez de encogerse hasta solaparse. */
+  @media (max-width: 560px) {
+    .interior {
+      height: auto;
+      flex-wrap: wrap;
+      row-gap: 0;
+      column-gap: 14px;
+      padding-block: 9px 4px;
+    }
+    .marca { order: 1; }
+    .derecha { order: 2; }
+    nav { order: 3; flex: 1 0 100%; }
+    ul {
+      gap: 20px;
+      padding-block: 8px 6px;
+      /* Si aun asi no caben, se desplazan en horizontal: nunca se ocultan. */
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    ul::-webkit-scrollbar { display: none; }
     nav a { font-size: 14px; }
-    .marca span:last-child { display: none; }
-    .descarga { padding: 7px 13px; }
-  }
-  @media (max-width: 420px) {
-    /* Nunca ocultar la navegacion: se aprieta, pero sigue alcanzable. */
-    .interior { gap: 12px; }
-    ul { gap: 11px; }
-    nav a { font-size: 13px; }
-    .derecha { gap: 7px; }
   }
 </style>
