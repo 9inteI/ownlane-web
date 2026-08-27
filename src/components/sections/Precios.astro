@@ -1,0 +1,73 @@
+---
+import { precios } from '../../data/landing';
+import { ruta, type Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const c = precios[lang];
+---
+<section class="seccion">
+  <div class="envoltorio">
+    <header class="cabecera revelar">
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h2>{c.titulo}</h2>
+    </header>
+
+    <div class="dos">
+      <div class="tarjeta col revelar">
+        <h3>{c.gratisTitulo}</h3>
+        <ul>
+          {c.gratis.map((l) => (
+            <li>
+              <span class="marca" aria-hidden="true">
+                <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>{l}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="tarjeta col plus revelar">
+        <h3>{c.plusTitulo}</h3>
+        <ul>
+          {c.plus.map((l) => (
+            <li>
+              <span class="marca" aria-hidden="true">
+                <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>{l}
+            </li>
+          ))}
+        </ul>
+        <p class="nota">{c.nota}</p>
+        <a class="enlace" href={ruta('plus', lang)}>{c.enlace} →</a>
+      </div>
+    </div>
+
+    <p class="remate revelar">{c.remate}</p>
+  </div>
+</section>
+
+<style>
+  .seccion { padding: 60px 0; content-visibility: auto; contain-intrinsic-size: auto 620px; }
+  .cabecera { margin-bottom: 28px; }
+  h2 { margin-top: 12px; }
+  .dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .col { padding: 28px; display: flex; flex-direction: column; }
+  .plus { background: var(--inverse-surface); color: var(--inverse-ink); border-color: transparent; }
+  h3 { margin-bottom: 18px; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+  li { display: flex; gap: 11px; align-items: flex-start; font-size: 16px; }
+  .marca { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--ink-soft); }
+  .plus .marca { color: var(--inverse-ink); opacity: 0.6; }
+  .marca svg { width: 100%; height: 100%; }
+  .nota { margin-top: 22px; font-size: 14px; color: var(--inverse-ink-soft); }
+  .enlace { margin-top: 12px; font-weight: 600; text-decoration: none; color: inherit; }
+  .enlace:hover { text-decoration: underline; }
+  .remate {
+    margin-top: 26px;
+    font-size: 18px;
+    font-weight: 600;
+    max-width: 62ch;
+    letter-spacing: -0.01em;
+  }
+</style>

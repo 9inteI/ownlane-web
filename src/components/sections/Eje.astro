@@ -1,0 +1,83 @@
+---
+/* Un eje de mensaje: texto a un lado, captura al otro. Se invierte en alternos. */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import InkSplash from '../ink/InkSplash.astro';
+import type { Bloque } from '../../data/landing';
+
+interface Props {
+  bloque: Bloque;
+  captura?: ImageMetadata;
+  alt?: string;
+  invertido?: boolean;
+  mancha?: 1 | 2 | 3;
+}
+const { bloque, captura, alt = '', invertido = false, mancha } = Astro.props;
+---
+<section class:list={['eje', { invertido, soloTexto: !captura }]}>
+  {mancha && (
+    <InkSplash
+      variante={mancha}
+      opacidad={0.06}
+      tam="min(400px, 56vw)"
+      suave
+      estilo={invertido ? 'top:-60px;left:-170px' : 'top:-60px;right:-170px'}
+    />
+  )}
+  <div class="envoltorio malla">
+    <div class="texto revelar">
+      <p class="eyebrow">{bloque.eyebrow}</p>
+      <h2>{bloque.titulo}</h2>
+      {bloque.cuerpo.map((p) => <p class="parrafo">{p}</p>)}
+      <slot />
+    </div>
+    {captura && (
+      <div class="movil revelar">
+        <Image
+          src={captura}
+          alt={alt}
+          width={280}
+          densities={[1, 2]}
+          quality={72}
+          loading="lazy"
+        />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .eje {
+    position: relative;
+    overflow: clip;
+    padding: 60px 0;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 560px;
+  }
+  .malla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+    gap: 56px;
+    align-items: center;
+  }
+  .invertido .malla { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); }
+  .invertido .texto { order: 2; }
+  .invertido .movil { order: 1; }
+  .soloTexto .malla { grid-template-columns: minmax(0, 1fr); }
+
+  h2 { margin: 12px 0 18px; max-width: 18ch; }
+  .parrafo { font-size: 18px; color: var(--ink-soft); max-width: 52ch; }
+  .parrafo + .parrafo { margin-top: 14px; }
+  .movil { justify-self: center; max-width: 280px; }
+  .movil :global(img) {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.15));
+  }
+
+  @media (max-width: 900px) {
+    .malla, .invertido .malla { grid-template-columns: 1fr; gap: 36px; }
+    .invertido .texto, .invertido .movil { order: initial; }
+    .movil { max-width: 240px; }
+  }
+</style>

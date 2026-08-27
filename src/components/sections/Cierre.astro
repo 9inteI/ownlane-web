@@ -1,0 +1,26 @@
+---
+import AppStoreBadge from '../AppStoreBadge.astro';
+import InkSplash from '../ink/InkSplash.astro';
+import { cierre } from '../../data/landing';
+import type { Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const c = cierre[lang];
+---
+<section class="cierre">
+  <InkSplash variante={3} opacidad={0.1} tam="min(560px, 74vw)" estilo="top:-140px;left:50%;transform:translateX(-50%)" />
+  <div class="envoltorio centro">
+    <h2>{c.titulo}</h2>
+    <p class="texto">{c.texto}</p>
+    <div class="accion"><AppStoreBadge lang={lang} /></div>
+  </div>
+</section>
+
+<style>
+  .cierre { position: relative; overflow: clip; padding: 96px 0 40px; text-align: center; }
+  .centro { display: grid; justify-items: center; }
+  h2 { font-size: clamp(30px, 5vw, 46px); }
+  .texto { margin-top: 16px; font-size: 18px; color: var(--ink-soft); max-width: 44ch; }
+  .accion { margin-top: 30px; }
+</style>

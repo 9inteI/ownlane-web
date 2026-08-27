@@ -1,7 +1,68 @@
 ---
 import Base from '../layouts/Base.astro';
+import Hero from '../components/sections/Hero.astro';
+import StatBlock from '../components/sections/StatBlock.astro';
+import Eje from '../components/sections/Eje.astro';
+import Tarjetas from '../components/sections/Tarjetas.astro';
+import Privacy from '../components/sections/Privacy.astro';
+import Watch from '../components/sections/Watch.astro';
+import Precios from '../components/sections/Precios.astro';
+import Cierre from '../components/sections/Cierre.astro';
+import { ejes } from '../data/landing';
+import { APP } from '../data/app';
+
+import cap2 from '../assets/capturas/appstore-2-movil.png';
+import cap3 from '../assets/capturas/appstore-3-movil.png';
+import cap5 from '../assets/capturas/appstore-5-movil.png';
+
 const lang = 'es' as const;
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: APP.nombre,
+  applicationCategory: 'HealthApplication',
+  operatingSystem: 'iOS, watchOS',
+  url: APP.sitio,
+  installUrl: APP.appStoreUrl,
+  inLanguage: ['es', 'en'],
+  description:
+    'Plan de running para principiantes que se ajusta a cómo te has sentido y se recoloca cuando fallas un día. Sin feed, sin cuenta y sin servidor.',
+  offers: [
+    { '@type': 'Offer', price: '0', priceCurrency: 'EUR', name: 'Own Lane' },
+    { '@type': 'Offer', price: '49.00', priceCurrency: 'EUR', name: 'Own Lane Plus (anual)' },
+    { '@type': 'Offer', price: '4.99', priceCurrency: 'EUR', name: 'Own Lane Plus (mensual)' },
+  ],
+};
 ---
-<Base lang={lang} pagina="home" titulo="Own Lane" descripcion="Provisional">
-  <div class="envoltorio"><h1>Own Lane</h1></div>
+<Base
+  lang={lang}
+  pagina="home"
+  titulo="Own Lane · Correr desde cero, sin feed"
+  descripcion="Un plan de running para principiantes que se ajusta a cómo te has sentido y se recoloca cuando fallas un día. Sin feed, sin cuenta y sin servidor."
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonld)} />
+
+  <Hero lang={lang} />
+  <StatBlock lang={lang} />
+
+  <Eje bloque={ejes.sentido[lang]} mancha={2} />
+  <Eje
+    bloque={ejes.dias[lang]}
+    captura={cap2}
+    alt="Pantalla de progreso: minutos corriendo por semana y salidas recientes"
+    invertido
+  />
+  <Eje
+    bloque={ejes.salida[lang]}
+    captura={cap3}
+    alt="Detalle de una salida: mapa, pulsaciones y ritmo por kilómetro"
+    mancha={1}
+  />
+
+  <Tarjetas lang={lang} />
+  <Privacy lang={lang} />
+  <Watch lang={lang} />
+  <Precios lang={lang} />
+  <Cierre lang={lang} />
 </Base>

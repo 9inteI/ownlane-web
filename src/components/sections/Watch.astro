@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+import { reloj } from '../../data/landing';
+import type { Idioma } from '../../i18n/routes';
+import hoy from '../../assets/capturas/watch-1-hoy.png';
+import plan from '../../assets/capturas/watch-2-plan.png';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const c = reloj[lang];
+const alt = lang === 'es'
+  ? ['La sesión de hoy en el Apple Watch', 'El plan de la semana en el Apple Watch']
+  : ["Today's session on Apple Watch", "The week's plan on Apple Watch"];
+---
+<section class="seccion">
+  <div class="envoltorio interior">
+    <div class="texto revelar">
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h2>{c.titulo}</h2>
+      {c.cuerpo.map((p) => <p class="parrafo">{p}</p>)}
+    </div>
+    <div class="relojes revelar">
+      {[hoy, plan].map((src, i) => (
+        <Image src={src} alt={alt[i]} width={180} densities={[1, 2]} loading="lazy" />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .seccion { padding: 60px 0; content-visibility: auto; contain-intrinsic-size: auto 420px; }
+  .interior {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: center;
+  }
+  h2 { margin: 12px 0 18px; max-width: 14ch; }
+  .parrafo { font-size: 18px; color: var(--ink-soft); max-width: 46ch; }
+  .parrafo + .parrafo { margin-top: 14px; }
+  .relojes { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+  .relojes :global(img) {
+    width: 180px;
+    height: auto;
+    border-radius: 26px;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.16));
+  }
+  @media (max-width: 860px) { .interior { grid-template-columns: 1fr; gap: 32px; } }
+</style>

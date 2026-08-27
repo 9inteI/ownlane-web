@@ -1,0 +1,60 @@
+---
+import { dato } from '../../data/landing';
+import type { Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const c = dato[lang];
+---
+<section class="bloque">
+  <div class="envoltorio interior">
+    <div class="cifras">
+      {c.cifras.map((f) => (
+        <div class="cifra">
+          <div class="valor num">{f.valor}</div>
+          <div class="etiqueta">{f.etiqueta}</div>
+        </div>
+      ))}
+    </div>
+    <div class="texto">
+      <p>{c.texto}</p>
+      <p class="remate">{c.remate}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Bloque invertido: tinta sobre papel en claro, papel calido sobre tinta en
+     oscuro. Es Palette.inverseSurface tal cual. */
+  .bloque {
+    margin: 88px 0;
+    background: var(--inverse-surface);
+    color: var(--inverse-ink);
+    padding: 56px 0;
+  }
+  .interior {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 44px;
+    align-items: center;
+  }
+  .cifras { display: flex; flex-wrap: wrap; gap: 40px; }
+  .valor {
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .etiqueta {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--inverse-ink-soft);
+    max-width: 22ch;
+  }
+  .texto { font-size: 19px; }
+  .remate { margin-top: 14px; font-weight: 600; }
+
+  @media (max-width: 800px) {
+    .interior { grid-template-columns: 1fr; gap: 32px; }
+  }
+</style>

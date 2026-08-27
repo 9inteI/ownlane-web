@@ -32,5 +32,32 @@ const tr = t(lang);
       <slot />
     </main>
     <Footer lang={lang} />
+
+    <!-- Reveals: CSS + IntersectionObserver, sin librerias. Los elementos ya
+         estan en el HTML visibles; esto solo anima su entrada. -->
+    <script is:inline>
+      (() => {
+        const objetivos = document.querySelectorAll('.revelar');
+        if (!objetivos.length) return;
+        if (
+          !('IntersectionObserver' in window) ||
+          matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          objetivos.forEach((el) => el.classList.add('visible'));
+          return;
+        }
+        const vigia = new IntersectionObserver(
+          (entradas) => {
+            for (const e of entradas) {
+              if (!e.isIntersecting) continue;
+              e.target.classList.add('visible');
+              vigia.unobserve(e.target);
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
+        );
+        objetivos.forEach((el) => vigia.observe(el));
+      })();
+    </script>
   </body>
 </html>

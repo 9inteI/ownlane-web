@@ -1,0 +1,30 @@
+---
+import { tarjetas } from '../../data/landing';
+import type { Idioma } from '../../i18n/routes';
+
+interface Props { lang: Idioma; }
+const { lang } = Astro.props;
+const c = tarjetas[lang];
+---
+<section class="seccion">
+  <div class="envoltorio rejilla">
+    {c.map((t) => (
+      <article class="tarjeta revelar">
+        <h3>{t.titulo}</h3>
+        {t.cuerpo.map((p) => <p>{p}</p>)}
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .seccion { padding: 60px 0; content-visibility: auto; contain-intrinsic-size: auto 420px; }
+  .rejilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .tarjeta { padding: 26px; }
+  h3 { margin-bottom: 12px; }
+  p { color: var(--ink-soft); font-size: 16px; }
+</style>
