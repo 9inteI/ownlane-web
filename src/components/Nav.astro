@@ -18,35 +18,77 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 <header class="barra">
   <div class="envoltorio">
-    <div class="interior">
-    <a class="marca" href={ruta('home', lang)}>
-      <span class="punto" aria-hidden="true"></span>
-      <span>Own Lane</span>
-    </a>
+    <div class="interior" data-nav>
+      <a class="marca" href={ruta('home', lang)}>
+        <span class="punto" aria-hidden="true"></span>
+        <span>Own Lane</span>
+      </a>
 
-    <nav aria-label={tr('nav.menu')}>
-      <ul>
-        {enlaces.map(({ clave, pagina }) => {
-          const href = ruta(pagina, lang);
-          return (
-            <li>
-              <a href={href} aria-current={actual === href ? 'page' : undefined}>{tr(clave)}</a>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-
-    <div class="derecha">
-      <LangSwitch lang={lang} alternas={alternas} />
-      <a class="descarga" href={APP.appStoreUrl}>{tr('cta.appstore')}</a>
+      {/* Enlaces e idioma. En escritorio es display:contents y sus hijos caen
+          en la fila de la pildora; en movil se convierte en un desplegable. */}
+      <div class="plegable" id="menu-nav">
+        <nav aria-label={tr('nav.menu')}>
+          <ul>
+            {enlaces.map(({ clave, pagina }) => {
+              const href = ruta(pagina, lang);
+              return (
+                <li>
+                  <a href={href} aria-current={actual === href ? 'page' : undefined}>{tr(clave)}</a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+        <LangSwitch lang={lang} alternas={alternas} />
       </div>
+
+      <a class="descarga" href={APP.appStoreUrl}>{tr('cta.appstore')}</a>
+
+      {/* Solo movil. Sin JS no aparece y el plegable se queda desplegado. */}
+      <button class="boton-menu" type="button" aria-controls="menu-nav" aria-expanded="false">
+        <span class="sr">{tr('nav.menu')}</span>
+        <span class="barritas" aria-hidden="true"><i></i><i></i></span>
+      </button>
     </div>
   </div>
 </header>
 
+<script is:inline>
+  (() => {
+    const barra = document.querySelector('[data-nav]');
+    const boton = barra?.querySelector('.boton-menu');
+    if (!barra || !boton) return;
+
+    const poner = (abierto) => {
+      barra.toggleAttribute('data-abierto', abierto);
+      boton.setAttribute('aria-expanded', String(abierto));
+    };
+
+    boton.addEventListener('click', () => poner(!barra.hasAttribute('data-abierto')));
+
+    // Cerrar al tocar fuera, al pulsar Escape y al seguir un enlace: un menu
+    // que se queda abierto tapando la pagina es peor que no tenerlo.
+    document.addEventListener('click', (e) => {
+      if (!barra.contains(e.target)) poner(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !barra.hasAttribute('data-abierto')) return;
+      poner(false);
+      boton.focus();
+    });
+    barra.querySelectorAll('.plegable a').forEach((a) =>
+      a.addEventListener('click', () => poner(false))
+    );
+
+    // Al pasar a escritorio el boton desaparece; el estado abierto tiene que
+    // irse con el o queda un atributo colgado que reaparece al volver a movil.
+    matchMedia('(min-width: 641px)').addEventListener('change', (e) => {
+      if (e.matches) poner(false);
+    });
+  })();
+</script>
+
 <style>
-  /* Pildora flotante de cristal, no una barra pegada al borde. */
   .barra {
     position: sticky;
     top: 0;
@@ -62,16 +104,15 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     align-items: center;
     gap: 22px;
     height: 54px;
-    padding-inline: 10px 10px;
+    padding-inline: 10px;
     pointer-events: auto;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--card) 72%, transparent);
+    background: color-mix(in srgb, var(--card) 84%, transparent);
     backdrop-filter: saturate(180%) blur(18px);
     -webkit-backdrop-filter: saturate(180%) blur(18px);
     box-shadow:
       inset 0 0 0 0.5px var(--card-border),
       0 6px 22px rgba(0, 0, 0, 0.07);
-    max-width: 980px;
   }
   @media (prefers-color-scheme: dark) {
     .interior { box-shadow: inset 0 0 0 0.5px var(--card-border), 0 6px 26px rgba(0, 0, 0, 0.5); }
@@ -87,6 +128,7 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     letter-spacing: -0.01em;
     text-decoration: none;
     white-space: nowrap;
+    flex: none;
   }
   .punto {
     width: 13px;
@@ -95,6 +137,10 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     background: var(--tint);
     flex: none;
   }
+
+  /* En escritorio el plegable no existe como caja: sus hijos caen directamente
+     en la fila de la pildora. */
+  .plegable { display: contents; }
   nav { flex: 1; min-width: 0; }
   ul { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; }
   nav a {
@@ -120,7 +166,6 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
   nav a:hover::after, nav a[aria-current='page']::after { right: 0; }
   nav a[aria-current='page'] { color: var(--ink); }
 
-  .derecha { display: flex; align-items: center; gap: 8px; margin-left: auto; }
   .descarga {
     font-size: 14px;
     font-weight: 600;
@@ -131,54 +176,101 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     text-decoration: none;
     transition: var(--press);
     white-space: nowrap;
+    flex: none;
   }
   .descarga:active { transform: scale(0.965); opacity: 0.86; }
 
-  @media (max-width: 700px) {
+  .boton-menu { display: none; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+  @media (max-width: 760px) {
+    .interior { gap: 16px; }
     ul { gap: 18px; }
     nav a { font-size: 14px; }
-    .descarga { padding: 8px 14px; }
   }
 
-  /* Por debajo de 600 no caben marca, tres enlaces, idioma y boton en una
-     fila: se montaban unos encima de otros y tocar English abria Soporte.
-     Bajan los enlaces a una segunda linea — pero la marca NO se oculta: un
-     punto suelto sin nombre al lado se lee como un fallo de carga, no como
-     una decision. */
-  @media (max-width: 600px) {
-    .barra { padding-top: 10px; }
-    .interior {
-      height: auto;
-      flex-wrap: wrap;
-      align-items: center;
-      row-gap: 0;
-      column-gap: 12px;
-      padding: 8px 8px 2px 4px;
-      border-radius: 24px;
+  /* Movil: UNA fila. Marca a la izquierda, App Store y el boton de menu a la
+     derecha; los enlaces y el idioma bajan a un desplegable. Antes caian a una
+     segunda linea dentro de la pildora y se leia como dos barras apiladas. */
+  @media (max-width: 640px) {
+    .interior { gap: 10px; padding-inline: 8px 6px; position: relative; }
+    .marca { flex: 1; padding-left: 10px; font-size: 14px; }
+    .descarga { font-size: 13px; padding: 8px 14px; }
+
+    .boton-menu {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border: 0;
+      border-radius: 50%;
+      background: var(--fill-2);
+      color: var(--ink);
+      cursor: pointer;
+      transition: var(--press);
     }
-    .marca { order: 1; padding-left: 10px; font-size: 14px; gap: 8px; }
-    .punto { width: 11px; height: 11px; }
-    .derecha { order: 2; gap: 6px; }
-    .descarga { font-size: 13px; padding: 8px 13px; }
-    nav { order: 3; flex: 1 0 100%; }
-    ul {
-      gap: 22px;
-      padding: 9px 10px 7px;
-      /* Si en algun idioma no cupieran, se desplazan: nunca se ocultan. */
-      overflow-x: auto;
-      scrollbar-width: none;
+    .boton-menu:active { transform: scale(0.94); }
+    .barritas { display: grid; gap: 4px; width: 15px; }
+    .barritas i {
+      display: block;
+      height: 1.7px;
+      border-radius: 2px;
+      background: currentColor;
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    ul::-webkit-scrollbar { display: none; }
-    /* El subrayado de hover no cabe en la fila apretada. */
-    nav a::after { bottom: -3px; }
+    [data-abierto] .barritas i:first-child { transform: translateY(2.85px) rotate(45deg); }
+    [data-abierto] .barritas i:last-child { transform: translateY(-2.85px) rotate(-45deg); }
+
+    /* Con JS empieza plegado; sin JS se queda desplegado y todo sigue
+       alcanzable, que es lo que no puede romperse. */
+    .plegable {
+      display: grid;
+      gap: 4px;
+      padding: 8px 6px 12px;
+      justify-items: start;
+    }
+    :global(.js) .plegable {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      padding: 10px;
+      border-radius: 22px;
+      /* Opaco, no translucido: con transparencia el titular de la pagina se
+         leia por debajo de los enlaces y no habia forma de distinguirlos. */
+      background: var(--card);
+      box-shadow:
+        inset 0 0 0 0.5px var(--card-border),
+        0 16px 40px rgba(0, 0, 0, 0.22);
+      opacity: 0;
+      transform: translateY(-6px) scale(0.985);
+      transform-origin: top center;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    :global(.js) [data-abierto] .plegable {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+    .plegable nav { flex: none; width: 100%; }
+    .plegable ul { flex-direction: column; gap: 0; width: 100%; }
+    .plegable nav a {
+      display: block;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 16px;
+      color: var(--ink);
+    }
+    .plegable nav a::after { display: none; }
+    .plegable nav a[aria-current='page'] { background: var(--fill-1); }
+    .plegable :global(.cambio) { margin: 6px 8px 2px; }
   }
 
   @media (max-width: 380px) {
-    .interior { column-gap: 8px; }
     .marca { font-size: 13px; }
-    .derecha :global(.cambio) { padding: 6px 9px; font-size: 12px; }
-    .descarga { font-size: 12px; padding: 7px 11px; }
-    ul { gap: 18px; }
+    .descarga { font-size: 12px; padding: 7px 12px; }
+    .boton-menu { width: 34px; height: 34px; }
   }
-
 </style>
