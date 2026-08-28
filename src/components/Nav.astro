@@ -17,7 +17,8 @@ const enlaces = [
 const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 <header class="barra">
-  <div class="envoltorio interior">
+  <div class="envoltorio">
+    <div class="interior">
     <a class="marca" href={ruta('home', lang)}>
       <span class="punto" aria-hidden="true"></span>
       <span>Own Lane</span>
@@ -39,6 +40,7 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     <div class="derecha">
       <LangSwitch lang={lang} alternas={alternas} />
       <a class="descarga" href={APP.appStoreUrl}>{tr('cta.appstore')}</a>
+      </div>
     </div>
   </div>
 </header>
@@ -53,6 +55,9 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     pointer-events: none;
   }
   .interior {
+    width: 100%;
+    max-width: 980px;
+    margin-inline: auto;
     display: flex;
     align-items: center;
     gap: 22px;
@@ -129,32 +134,51 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
   .descarga:active { transform: scale(0.965); opacity: 0.86; }
 
-  @media (max-width: 640px) {
-    ul { gap: 16px; }
+  @media (max-width: 700px) {
+    ul { gap: 18px; }
     nav a { font-size: 14px; }
-    .marca span:last-child { display: none; }
+    .descarga { padding: 8px 14px; }
   }
-  /* Por debajo de 560 no caben marca, tres enlaces, idioma y boton en una fila:
-     se montaban unos encima de otros y tocar English abria Soporte. */
-  @media (max-width: 560px) {
+
+  /* Por debajo de 600 no caben marca, tres enlaces, idioma y boton en una
+     fila: se montaban unos encima de otros y tocar English abria Soporte.
+     Bajan los enlaces a una segunda linea — pero la marca NO se oculta: un
+     punto suelto sin nombre al lado se lee como un fallo de carga, no como
+     una decision. */
+  @media (max-width: 600px) {
     .barra { padding-top: 10px; }
     .interior {
       height: auto;
       flex-wrap: wrap;
+      align-items: center;
       row-gap: 0;
-      column-gap: 14px;
-      padding: 9px 10px 4px;
-      border-radius: 26px;
+      column-gap: 12px;
+      padding: 8px 8px 2px 4px;
+      border-radius: 24px;
     }
-    .marca { order: 1; padding-left: 6px; }
-    .derecha { order: 2; }
+    .marca { order: 1; padding-left: 10px; font-size: 14px; gap: 8px; }
+    .punto { width: 11px; height: 11px; }
+    .derecha { order: 2; gap: 6px; }
+    .descarga { font-size: 13px; padding: 8px 13px; }
     nav { order: 3; flex: 1 0 100%; }
     ul {
-      gap: 20px;
-      padding: 8px 6px 6px;
+      gap: 22px;
+      padding: 9px 10px 7px;
+      /* Si en algun idioma no cupieran, se desplazan: nunca se ocultan. */
       overflow-x: auto;
       scrollbar-width: none;
     }
     ul::-webkit-scrollbar { display: none; }
+    /* El subrayado de hover no cabe en la fila apretada. */
+    nav a::after { bottom: -3px; }
   }
+
+  @media (max-width: 380px) {
+    .interior { column-gap: 8px; }
+    .marca { font-size: 13px; }
+    .derecha :global(.cambio) { padding: 6px 9px; font-size: 12px; }
+    .descarga { font-size: 12px; padding: 7px 11px; }
+    ul { gap: 18px; }
+  }
+
 </style>
