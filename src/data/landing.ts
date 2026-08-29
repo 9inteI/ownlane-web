@@ -248,7 +248,7 @@ export const precios: Bilingue<{
     ],
     remate:
       'Y el plan se seguirá ajustando a cómo te sientas, pagues o no: cobrar por lo que evita que te lesiones no lo vamos a hacer.',
-    nota: '49 € al año o 4,99 € al mes, con una semana de prueba. Cancela cuando quieras.',
+    nota: '49,99 € al año, con 7 días de prueba gratis, o 7,99 € al mes. Cancela cuando quieras.',
     enlace: 'Ver todo lo que trae Plus',
   },
   en: {
@@ -276,7 +276,7 @@ export const precios: Bilingue<{
     ],
     remate:
       "And the plan will keep adjusting to how you feel, whether you pay or not: charging for what stops you getting injured is something we won't do.",
-    nota: '€49 a year or €4.99 a month, with a one-week trial. Cancel any time.',
+    nota: '€49.99 a year, with a 7-day free trial, or €7.99 a month. Cancel any time.',
     enlace: 'See everything Plus includes',
   },
 };

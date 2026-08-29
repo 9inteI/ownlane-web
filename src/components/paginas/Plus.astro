@@ -62,12 +62,12 @@ const jsonld = {
         <p class="eyebrow">{c.precioTitulo}</p>
         <div class="cifras">
           <div class="opcion">
-            <div class="num">{APP.precios.anual}</div>
+            <div class="num">{lang === 'es' ? APP.precios.anual : APP.precios.anualEN}</div>
             <div class="periodo">{c.anual}</div>
             <div class="nota">{c.ahorro}</div>
           </div>
           <div class="opcion">
-            <div class="num">{APP.precios.mensual}</div>
+            <div class="num">{lang === 'es' ? APP.precios.mensual : APP.precios.mensualEN}</div>
             <div class="periodo">{c.mensual}</div>
           </div>
         </div>

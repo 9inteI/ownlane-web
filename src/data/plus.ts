@@ -154,8 +154,8 @@ export const paginaPlus = {
     precioTitulo: 'Precio',
     anual: 'al año',
     mensual: 'al mes',
-    prueba: 'Una semana de prueba. Cancela cuando quieras, desde Ajustes del iPhone.',
-    ahorro: 'Sale a 4,08 € al mes',
+    prueba: '7 días de prueba gratis en el plan anual. Cancela cuando quieras, desde Ajustes del iPhone.',
+    ahorro: 'Sale a 4,17 € al mes',
     gestion: '¿Cómo se cancela?',
   },
   en: {
@@ -169,8 +169,8 @@ export const paginaPlus = {
     precioTitulo: 'Price',
     anual: 'a year',
     mensual: 'a month',
-    prueba: 'One-week trial. Cancel any time from your iPhone Settings.',
-    ahorro: 'Works out at €4.08 a month',
+    prueba: '7-day free trial on the yearly plan. Cancel any time from your iPhone Settings.',
+    ahorro: 'Works out at €4.17 a month',
     gestion: 'How do I cancel?',
   },
 } as const;
