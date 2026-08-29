@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/index.html", "destination": "/soporte", "permanent": true },
+    { "source": "/privacidad.html", "destination": "/privacidad", "permanent": true },
+    { "source": "/es", "destination": "/", "permanent": true },
+    { "source": "/es/:ruta*", "destination": "/:ruta*", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/_astro/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
+}

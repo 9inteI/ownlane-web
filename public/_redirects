@@ -1,3 +1,8 @@
+# OJO: este fichero es sintaxis de Netlify y Cloudflare Pages. El sitio se
+# despliega en VERCEL, que NO lo lee: las redirecciones de verdad estan en
+# vercel.json, en la raiz. Se mantiene por si algun dia se cambia de hosting,
+# pero si tocas una redireccion, tocala en los DOS sitios.
+#
 # El sitio anterior eran dos HTML sueltos, y / era la pagina de SOPORTE,
 # que es la URL registrada en App Store Connect. 301 reales: los redirects
 # nativos de Astro emiten meta-refresh, no cabecera.
