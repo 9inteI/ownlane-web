@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Saca los siete articulos de Aprende del repo de la app a MDX bilingue.
+"""Saca los articulos de Aprende del repo de la app a MDX bilingue.
 
 Los articulos ya estan escritos, con sus fuentes citadas, y ya estan traducidos:
 LearnLibrary.swift tiene el espanol y Localizable.xcstrings el ingles. No hay
@@ -41,7 +41,7 @@ for bruto in bloques:
     m = re.search(r'id:\s*"([^"]+)"', bruto)
     if not m:
         continue
-    art = {'id': m.group(1)}
+    art = {'id': m.group(1), 'order': len(articulos)}
     art['title'] = desescapa(re.search(r'title:\s*' + CADENA, bruto).group(1))
     art['teaser'] = desescapa(re.search(r'teaser:\s*' + CADENA, bruto).group(1))
     art['category'] = re.search(r'category:\s*\.(\w+)', bruto).group(1)
@@ -80,6 +80,10 @@ for bruto in bloques:
     articulos.append(art)
 
 # Slugs en ingles: el id de la app esta en espanol.
+#
+# Se eligen pensando en lo que se busca, no traduciendo el titulo: quien tiene
+# el problema escribe «why do i get a side stitch», no «transient abdominal
+# pain». El slug es la unica parte de la URL que Google lee como texto.
 SLUG_EN = {
     've-mas-despacio': 'go-slower',
     'flato': 'side-stitch',
@@ -88,6 +92,18 @@ SLUG_EN = {
     'primeras-zapatillas': 'first-shoes',
     'fuerza': 'strength',
     'cadencia': 'cadence',
+    'dormir': 'sleep-and-injury',
+    'agujetas': 'stretching-doesnt-help-soreness',
+    'ayunas': 'fasted-running',
+    'volver': 'coming-back-after-a-break',
+    'calor': 'running-in-heat',
+    'superficies': 'running-surfaces',
+    'semaforo-dolor': 'when-to-stop-running',
+    'recuperacion': 'foam-roller-ice-compression',
+    'rodilla-corredor': 'runners-knee',
+    'respirar-nariz': 'nasal-breathing',
+    'musica': 'music-and-running',
+    'cuanto-tardas': 'how-long-to-see-progress',
 }
 
 def escapa_yaml(s):
@@ -104,6 +120,7 @@ def a_mdx(art, lang):
         f'minutes: {art["minutes"]}',
         f'evidence: {art["evidence"]}',
         f'lang: {lang}',
+        f'order: {art["order"]}',
         f'translationKey: {art["id"]}',
         f'slug: {slug}',
         'updated: 2026-08-27',
@@ -142,6 +159,9 @@ for lang in ('es', 'en'):
     carpeta = f'{DESTINO}/{lang}'
     os.makedirs(carpeta, exist_ok=True)
     for art in articulos:
+        if lang == 'en' and art['id'] not in SLUG_EN:
+            print(f'  SIN SLUG EN INGLES: {art["id"]} — anadelo a SLUG_EN', file=sys.stderr)
+            continue
         slug = art['id'] if lang == 'es' else SLUG_EN[art['id']]
         open(f'{carpeta}/{slug}.mdx', 'w', encoding='utf-8').write(a_mdx(art, lang))
 

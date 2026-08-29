@@ -47,6 +47,7 @@ const fecha = new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-GB', {
   titulo={`${d.title} · Own Lane`}
   descripcion={d.teaser}
   alternas={alternas}
+  tipo="article"
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonld)} />
 

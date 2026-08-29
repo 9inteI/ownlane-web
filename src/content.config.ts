@@ -12,6 +12,10 @@ const aprende = defineCollection({
     minutes: z.number().int().positive(),
     evidence: z.enum(['solid', 'reasonable', 'myth']),
     lang: z.enum(['es', 'en']),
+    /** El orden en que Aprende los presenta dentro de la app. Es pedagogico
+     *  —«ve mas despacio» antes que «rodilla de corredor»— y por eso manda
+     *  sobre el alfabetico, que no significa nada. */
+    order: z.number().int().nonnegative(),
     /** Une la version espanola con la inglesa: lo usan el selector de idioma
      *  y los hreflang por articulo. */
     translationKey: z.string(),

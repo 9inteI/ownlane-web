@@ -10,8 +10,11 @@ interface Props { lang: Idioma; }
 const { lang } = Astro.props;
 const tr = t(lang);
 
+// Por el orden de la app, no alfabetico: «ve mas despacio» va antes que
+// «rodilla de corredor» porque uno se lee al empezar y el otro cuando ya
+// duele algo. El alfabetico no dice nada.
 const todos = (await getCollection('aprende', (a) => a.data.lang === lang)).sort(
-  (a, b) => a.data.title.localeCompare(b.data.title)
+  (a, b) => a.data.order - b.data.order
 );
 
 const c = {
@@ -22,6 +25,10 @@ const c = {
     h1: 'Lo que está demostrado, y lo que solo se repite',
     entradilla: 'Cada artículo lleva sus fuentes al pie y una etiqueta que dice cuánto respaldo tiene. Incluidas las cosas que todo el mundo repite y no tienen ninguno.',
     categorias: { technique: 'Técnica', breathing: 'Respiración', gear: 'Material', injuries: 'Lesiones', training: 'Entrenamiento' },
+    todos: 'Todo',
+    mitos: 'Mitos',
+    filtrar: 'Filtrar artículos',
+    vacio: 'No hay artículos con ese filtro.',
   },
   en: {
     titulo: 'Own Lane · Learn',
@@ -30,8 +37,21 @@ const c = {
     h1: "What's proven, and what just gets repeated",
     entradilla: 'Every article cites its sources and carries a label saying how much backing it has. Including the things everyone repeats that have none.',
     categorias: { technique: 'Technique', breathing: 'Breathing', gear: 'Gear', injuries: 'Injuries', training: 'Training' },
+    todos: 'All',
+    mitos: 'Myths',
+    filtrar: 'Filter articles',
+    vacio: 'No articles match that filter.',
   },
 }[lang];
+
+/** Los filtros que de verdad hay contenido para llenar, con su cuenta. Se
+ *  calculan de la coleccion: si algun dia desaparece la ultima pieza de
+ *  «Respiración», el filtro desaparece solo en vez de quedarse vacío. */
+const categorias = (['training', 'injuries', 'technique', 'gear', 'breathing'] as const)
+  .map((id) => ({ id, nombre: c.categorias[id], n: todos.filter((a) => a.data.category === id).length }))
+  .filter((f) => f.n > 0);
+
+const mitos = todos.filter((a) => a.data.evidence === 'myth').length;
 ---
 <Base lang={lang} pagina="aprende" titulo={c.titulo} descripcion={c.descripcion}>
   <section class="cabecera">
@@ -43,35 +63,124 @@ const c = {
     </div>
   </section>
 
-  <div class="envoltorio rejilla">
-    {todos.map((a) => (
-      <article class="tarjeta ficha revelar">
-        <a class="enlace" href={rutaArticulo(a.data.slug, lang)}>
-          <span class="sr">{a.data.title}</span>
-        </a>
-        <div class="alto">
-          <EvidenceBadge nivel={a.data.evidence} lang={lang} compacto />
-          <span class="meta">{c.categorias[a.data.category]} · {a.data.minutes} {tr('articulo.minutos')}</span>
-        </div>
-        <h2>{a.data.title}</h2>
-        <p>{a.data.teaser}</p>
-      </article>
-    ))}
+  <div class="envoltorio">
+    <!-- Sin JS los botones no aparecen y se ven los 19: el filtro es una
+         comodidad, nunca la unica forma de llegar a un articulo. -->
+    <div class="filtros solo-js" role="group" aria-label={c.filtrar}>
+      <button class="chip activo" data-filtro="todos" aria-pressed="true">
+        {c.todos} <span class="n">{todos.length}</span>
+      </button>
+      {mitos > 0 && (
+        <button class="chip mito" data-filtro="mito" aria-pressed="false">
+          {c.mitos} <span class="n">{mitos}</span>
+        </button>
+      )}
+      {categorias.map((f) => (
+        <button class="chip" data-filtro={f.id} aria-pressed="false">
+          {f.nombre} <span class="n">{f.n}</span>
+        </button>
+      ))}
+    </div>
+
+    <div class="rejilla" id="rejilla">
+      {todos.map((a) => (
+        <article
+          class="tarjeta ficha revelar"
+          data-categoria={a.data.category}
+          data-evidencia={a.data.evidence}
+        >
+          <a class="enlace" href={rutaArticulo(a.data.slug, lang)}>
+            <span class="sr">{a.data.title}</span>
+          </a>
+          <div class="alto">
+            <EvidenceBadge nivel={a.data.evidence} lang={lang} compacto />
+            <span class="meta">{c.categorias[a.data.category]} · {a.data.minutes} {tr('articulo.minutos')}</span>
+          </div>
+          <h2>{a.data.title}</h2>
+          <p>{a.data.teaser}</p>
+        </article>
+      ))}
+    </div>
+
+    <p class="vacio solo-js" hidden>{c.vacio}</p>
   </div>
 </Base>
+
+<script is:inline>
+  (() => {
+    const rejilla = document.getElementById('rejilla');
+    if (!rejilla) return;
+    const chips = document.querySelectorAll('.filtros .chip');
+    const fichas = rejilla.querySelectorAll('.ficha');
+    const vacio = document.querySelector('.vacio');
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const f = chip.dataset.filtro;
+        chips.forEach((o) => {
+          const activo = o === chip;
+          o.classList.toggle('activo', activo);
+          o.setAttribute('aria-pressed', String(activo));
+        });
+        let visibles = 0;
+        fichas.forEach((ficha) => {
+          const pasa =
+            f === 'todos' ||
+            (f === 'mito' ? ficha.dataset.evidencia === 'myth' : ficha.dataset.categoria === f);
+          ficha.hidden = !pasa;
+          if (pasa) visibles++;
+        });
+        if (vacio) vacio.hidden = visibles > 0;
+      });
+    });
+  })();
+</script>
 
 <style>
   .cabecera { position: relative; overflow: clip; padding: 60px 0 12px; }
   h1 { margin: 14px 0 16px; max-width: 20ch; }
   .entradilla { font-size: 19px; color: var(--ink-soft); max-width: 56ch; }
+
+  /* Solo se muestran con JS: sin el, los articulos se ven todos y estos
+     botones no harian nada. */
+  :global(html:not(.js)) .solo-js { display: none; }
+
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 32px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--fill-2);
+    color: var(--ink-soft);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--press);
+  }
+  .chip:hover { color: var(--ink); }
+  .chip:active { transform: scale(0.965); }
+  .chip.activo { background: var(--tint); color: var(--on-tint); }
+  .chip .n { font-size: 12px; font-weight: 500; opacity: 0.6; }
+  .chip.activo .n { opacity: 0.75; }
+
   .rejilla {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
     gap: 20px;
-    padding-top: 36px;
+    padding-top: 24px;
   }
   .ficha { position: relative; padding: 24px; transition: var(--press); }
   .ficha:hover { transform: translateY(-2px); }
+  .ficha[hidden] { display: none; }
   /* Enlace que cubre la tarjeta: el area de click es toda, pero en el DOM
      sigue habiendo un solo <a> con texto, que es lo que lee un lector. */
   .enlace { position: absolute; inset: 0; border-radius: inherit; }
@@ -80,4 +189,5 @@ const c = {
   .meta { font-size: 12px; color: var(--ink-soft); }
   h2 { font-size: 19px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em; }
   .ficha p { color: var(--ink-soft); font-size: 16px; }
+  .vacio { padding: 40px 0; color: var(--ink-soft); }
 </style>

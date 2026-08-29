@@ -10,9 +10,12 @@ interface Props {
   /** Para paginas fuera del mapa (articulos): rutas ES y EN explicitas. */
   alternas?: { es: string; en: string };
   og?: string;
+  /** Los articulos son 'article'; el resto, 'website'. Cambia como los
+   *  presentan Facebook, LinkedIn y WhatsApp al compartirlos. */
+  tipo?: 'website' | 'article';
 }
 
-const { titulo, descripcion, lang, pagina, alternas, og = '/og/landing-es.png' } = Astro.props;
+const { titulo, descripcion, lang, pagina, alternas, og = '/og/landing-es.png', tipo = 'website' } = Astro.props;
 
 const alt = alternas ?? (pagina ? rutas[pagina] : null);
 const canonical = new URL(Astro.url.pathname, APP.sitio).href.replace(/(.)\/$/, '$1');
@@ -32,7 +35,7 @@ const ogAbs = new URL(og, APP.sitio).href;
   </>
 )}
 
-<meta property="og:type" content="website" />
+<meta property="og:type" content={tipo} />
 <meta property="og:title" content={titulo} />
 <meta property="og:description" content={descripcion} />
 <meta property="og:url" content={canonical} />

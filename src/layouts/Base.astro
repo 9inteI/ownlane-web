@@ -14,16 +14,17 @@ interface Props {
   pagina?: Pagina;
   alternas?: { es: string; en: string };
   og?: string;
+  tipo?: 'website' | 'article';
 }
 
-const { titulo, descripcion, lang, pagina, alternas, og } = Astro.props;
+const { titulo, descripcion, lang, pagina, alternas, og, tipo } = Astro.props;
 const alt = alternas ?? (pagina ? { ...rutas[pagina] } : { es: '/', en: '/en' });
 const tr = t(lang);
 ---
 <!doctype html>
 <html lang={lang}>
   <head>
-    <Head titulo={titulo} descripcion={descripcion} lang={lang} pagina={pagina} alternas={alt} og={og} />
+    <Head titulo={titulo} descripcion={descripcion} lang={lang} pagina={pagina} alternas={alt} og={og} tipo={tipo} />
     <slot name="head" />
   </head>
   <body>
