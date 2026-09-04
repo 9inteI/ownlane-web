@@ -4,7 +4,8 @@ import { Image } from 'astro:assets';
 import InkSplash from '../ink/InkSplash.astro';
 import { APP } from '../../data/app';
 import { ruta, type Idioma } from '../../i18n/routes';
-import logo from '../../assets/brand/ownlane-logo.png';
+import Glifo from '../Glifo.astro';
+import icono from '../../assets/brand/icono.png';
 
 interface Props { lang: Idioma; }
 const { lang } = Astro.props;
@@ -33,13 +34,16 @@ const c = {
     copiado: 'Copiado',
     marcaTitulo: 'Uso de la marca',
     marca: [
-      'El logotipo es una mancha de tinta. No lo gires, no lo recolorees y no lo pongas dentro de otra forma.',
+      'El logotipo es un corredor de tinta. No lo gires, no lo recolorees y no lo pongas dentro de otra forma.',
+      'El logotipo va siempre sin fondo. El cuadrado con la mancha en la esquina es el icono de la app y solo se usa como icono.',
       'Deja alrededor un espacio libre de al menos la mitad de su ancho.',
       'Sobre fondo claro, en negro. Sobre fondo oscuro, en blanco. Nunca sobre una foto.',
       'El nombre se escribe «Own Lane», dos palabras, ambas con mayúscula inicial.',
     ],
     descargaTitulo: 'Descargas',
-    logoDescarga: 'Logotipo (PNG, 2508 × 2508)',
+    logoDescarga: 'Logotipo, fondo transparente (SVG vectorial y PNG, 3336 × 3472)',
+    iconoNombre: 'Icono de la app',
+    iconoDescarga: 'El cuadrado tal y como sale en iOS (PNG, 1024 × 1024)',
     capturasNota: 'Para capturas a resolución completa o material que no esté aquí, escríbeme y te lo mando.',
   },
   en: {
@@ -65,13 +69,16 @@ const c = {
     copiado: 'Copied',
     marcaTitulo: 'Using the brand',
     marca: [
-      'The logo is an ink splash. Do not rotate it, do not recolour it and do not place it inside another shape.',
+      'The logo is an ink runner. Do not rotate it, do not recolour it and do not place it inside another shape.',
+      'The logo always goes without a background. The square with the ink pool in the corner is the app icon and is only used as an icon.',
       'Leave clear space around it of at least half its width.',
       'Black on light backgrounds. White on dark ones. Never over a photo.',
       'The name is written "Own Lane", two words, both capitalised.',
     ],
     descargaTitulo: 'Downloads',
-    logoDescarga: 'Logo (PNG, 2508 × 2508)',
+    logoDescarga: 'Logo, transparent background (vector SVG and PNG, 3336 × 3472)',
+    iconoNombre: 'App icon',
+    iconoDescarga: 'The square exactly as it ships on iOS (PNG, 1024 × 1024)',
     capturasNota: 'For full-resolution screenshots or anything not listed here, write to me and I will send it.',
   },
 }[lang];
@@ -114,12 +121,26 @@ const c = {
     <section>
       <h2>{c.descargaTitulo}</h2>
       <div class="tarjeta descarga">
-        <Image src={logo} alt="" aria-hidden="true" width={64} densities={[1, 2]} />
+        <Glifo clase="muestra" />
         <div>
           <p><strong>Own Lane</strong></p>
           <p class="sutil">{c.logoDescarga}</p>
         </div>
-        <a class="boton" href="/prensa/ownlane-logo.png" download>PNG</a>
+        <div class="botones">
+          <a class="boton" href="/prensa/ownlane-marca.svg" download>SVG</a>
+          <a class="boton" href="/prensa/ownlane-marca.png" download>PNG</a>
+        </div>
+      </div>
+
+      <div class="tarjeta descarga">
+        <Image src={icono} alt="" aria-hidden="true" width={64} densities={[1, 2]} />
+        <div>
+          <p><strong>{c.iconoNombre}</strong></p>
+          <p class="sutil">{c.iconoDescarga}</p>
+        </div>
+        <div class="botones">
+          <a class="boton" href="/prensa/ownlane-icono.png" download>PNG</a>
+        </div>
       </div>
       <p class="sutil nota">{c.capturasNota}</p>
     </section>
@@ -188,10 +209,13 @@ const c = {
   .copiar:active { transform: scale(0.965); }
 
   .descarga { display: flex; align-items: center; gap: 16px; padding: 18px 20px; }
+  .descarga + .descarga { margin-top: 14px; }
+  /* El icono lleva su cuadrado; el logotipo no lleva nada. */
   .descarga :global(img) { border-radius: 14px; }
+  .descarga :global(.muestra) { width: 64px; flex: none; color: var(--splash); }
   .descarga p { font-size: 15px; }
+  .botones { margin-left: auto; display: flex; gap: 8px; }
   .boton {
-    margin-left: auto;
     font-size: 14px;
     font-weight: 600;
     padding: 9px 16px;

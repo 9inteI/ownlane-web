@@ -1,66 +1,59 @@
 ---
-/* Hero asimetrico: el titular manda a ancho completo, y el grupo de
- * dispositivos flota por debajo y a la derecha, solapandolo.
+/* El hero es la marca. Todo lo demas se coloca a su alrededor.
  *
- * La regla de las dos lineas: el H1 va en un contenedor de 64rem a ancho
- * completo, no dentro de una columna de rejilla. Antes caia en una columna de
- * ~520 px y salian tres lineas en escritorio y cuatro en movil. */
-import { Image } from 'astro:assets';
-import GrupoDispositivos from '../GrupoDispositivos.astro';
+ * Composicion: el corredor ocupa la mitad derecha a tamano grande y sangra por
+ * el borde; el titular vive en la izquierda. La cola de salpicadura, que es lo
+ * unico del dibujo que llega hasta el texto, se disuelve con una mascara en
+ * diagonal, asi que nunca hay tinta debajo de una linea de texto.
+ *
+ * La entrada imita como se lanza la tinta: un barrido diagonal de abajo-
+ * izquierda a arriba-derecha que revela primero la cola y por ultimo la figura.
+ * Es un clip-path animado, no un fade, porque un fade no tiene direccion y aqui
+ * la direccion es justamente el gesto de la marca.
+ *
+ * Los moviles ya no estan aqui: aparecen en la siguiente seccion, en las tres
+ * fichas de Apilado. Encima del pliegue compiten con la marca y no ganan.
+ */
+import Marca from '../Marca.astro';
 import AppStoreBadge from '../AppStoreBadge.astro';
-import Splatter from '../ink/Splatter.astro';
 import CursorTrail from '../ink/CursorTrail.astro';
 import { hero } from '../../data/landing';
-import { captura } from '../../data/capturas';
+import { APP } from '../../data/app';
 import type { Idioma } from '../../i18n/routes';
-import logo from '../../assets/brand/ownlane-logo.png';
 
 interface Props { lang: Idioma; }
 const { lang } = Astro.props;
 const c = hero[lang];
 const [linea1, linea2] = c.h1.split('\n');
-
-const hoy = captura('hoy', lang);
-const plan = captura('plan', lang);
 ---
 <section class="hero">
-  <Splatter
-    variante={1}
-    tam="min(720px, 88vw)"
-    opacidad={0.085}
-    brillo
-    parallax={0.1}
-    estilo="top:-220px;right:-240px"
-  />
   <CursorTrail />
 
-  <div class="envoltorio">
-    <div class="titular">
-      <Image class="logo" src={logo} alt="" aria-hidden="true" width={64} densities={[1, 2]} loading="eager" />
-      <h1>
-        <span class="linea">{linea1}</span>
-        <span class="linea baja">{linea2}</span>
-      </h1>
-    </div>
-
-    <div class="pie">
-      <p class="entradilla">{c.entradilla}</p>
-      <div class="acciones">
-        <AppStoreBadge lang={lang} />
-        <p class="nota sutil">{c.pie}</p>
-      </div>
+  {/* El parallax lo mueve Tinta.astro poniendo --desvio. Aqui se usa en
+      diagonal, no en vertical: al bajar, el corredor se va hacia arriba y a la
+      derecha, como si saliera de la pagina. */}
+  <div class="escena" data-parallax="0.055">
+    <div class="lanzada">
+      <Marca destello parpadeo />
     </div>
   </div>
 
-  <div class="flota">
-    <GrupoDispositivos
-      ancho={236}
-      prioritario
-      piezas={[
-        { src: hoy.claro, srcOscuro: hoy.oscuro, alt: hoy.alt },
-        { src: plan.claro, srcOscuro: plan.oscuro, alt: plan.alt },
-      ]}
-    />
+  <div class="envoltorio interior">
+    <div class="texto">
+      <p class="eyebrow marca-nombre">{APP.nombre}</p>
+      <h1>
+        <span class="linea"><span>{linea1}</span></span>
+        <span class="linea baja"><span>{linea2}</span></span>
+      </h1>
+
+      <div class="pie">
+        <p class="entradilla">{c.entradilla}</p>
+        <div class="acciones">
+          <AppStoreBadge lang={lang} />
+          <p class="nota sutil">{c.pie}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -68,67 +61,134 @@ const plan = captura('plan', lang);
   .hero {
     position: relative;
     overflow: clip;
-    padding: 40px 0 0;
     isolation: isolate;
+    display: grid;
+    align-items: center;
+    min-height: min(92vh, 920px);
+    padding: 48px 0 72px;
   }
 
-  .logo { width: 64px; height: 64px; border-radius: 17px; margin-bottom: 30px; }
+  .interior { position: relative; z-index: 2; }
+  /* La columna de texto se corta antes de llegar a la tinta. Sin este limite
+     el titular se mete por debajo del corredor en pantallas anchas. */
+  .texto { max-width: min(40rem, 46vw); }
 
-  /* Aqui esta la correccion: 64rem a ancho completo, no una columna estrecha. */
-  /* Metrica de las dos lineas, calculada, no a ojo:
-     a 4.4rem (70 px) la linea 1 son 26 caracteres ~ 693 px y la linea 2 son
-     21 caracteres ~ 600 px. Las dos caben de sobra en los 1024 px del
-     contenedor, asi que el H1 son DOS lineas y no tres. */
-  .titular { max-width: 64rem; }
+  /* ── La marca ──────────────────────────────────────────────────────────── */
+
+  /* El centrado vertical va en `translate` y el parallax en `transform`: son
+     propiedades distintas y se componen solas, sin pisarse. */
+  .escena {
+    position: absolute;
+    top: 48%;
+    right: max(-2.4vw, -38px);
+    width: min(58vw, 760px);
+    translate: 0 -50%;
+    transform: translate(calc(var(--desvio, 0px) * -0.7), var(--desvio, 0px));
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Dos efectos sobre la misma caja, que es de este componente y no de
+     Marca.astro (los estilos con ambito no cruzan al hijo):
+       - la mascara disuelve la cola antes de que llegue al texto. 48deg es la
+         diagonal del propio dibujo, donde muere la salpicadura;
+       - el clip-path la lanza al entrar. */
+  .lanzada {
+    -webkit-mask-image: linear-gradient(62deg, transparent 2%, rgba(0, 0, 0, 0.55) 12%, #000 30%);
+    mask-image: linear-gradient(62deg, transparent 2%, rgba(0, 0, 0, 0.55) 12%, #000 30%);
+  }
+
+  /* El borde del clip va inclinado, asi que la cola aparece antes que la
+     figura. Sin JS no hay animacion y la marca sale entera. */
+  :global(.js) .lanzada {
+    animation: lanzar 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+  @keyframes lanzar {
+    from { clip-path: polygon(0 0, -12% 0, -78% 100%, 0 100%); }
+    to { clip-path: polygon(0 0, 215% 0, 149% 100%, 0 100%); }
+  }
+
+  /* ── El titular ────────────────────────────────────────────────────────── */
+
+  .marca-nombre { letter-spacing: 0.14em; }
+
   h1 {
-    font-size: clamp(2.6rem, 4.6vw, 4.4rem);
-    line-height: 1.04;
+    margin-top: 18px;
+    font-size: clamp(2.2rem, 3.4vw, 3.2rem);
+    line-height: 1.06;
     letter-spacing: -0.035em;
   }
-  .linea { display: block; }
+  /* Cada linea se descubre desde abajo dentro de su propia caja. */
+  .linea { display: block; overflow: hidden; padding-bottom: 0.06em; }
+  .linea > span { display: block; }
   .baja { color: var(--ink-soft-lg); }
 
-
-  /* Una sola columna: en dos, la entradilla se queda en 380 px y sale un
-     parrafo de cuatro lineas, que es justo lo que no queremos. */
   .pie {
     display: grid;
-    gap: 30px;
+    gap: 28px;
     justify-items: start;
-    margin-top: 40px;
-    max-width: 44rem;
+    margin-top: 34px;
+    max-width: 34rem;
   }
-  .entradilla { font-size: clamp(17px, 1.5vw, 20px); color: var(--ink-soft); max-width: 46ch; }
+  .entradilla { font-size: clamp(17px, 1.4vw, 19px); color: var(--ink-soft); max-width: 42ch; }
   .acciones { display: grid; justify-items: start; gap: 12px; }
   .nota { font-size: 13px; }
 
-  /* El grupo de moviles flota a la derecha y solapa el titular por abajo.
-     Va absoluto y el texto se limita a la mitad izquierda: si se deja en flujo
-     con margen negativo, se come el boton de descarga. */
-  .flota { pointer-events: none; }
-  .flota > :global(*) { pointer-events: auto; }
+  /* Entradas escalonadas. El orden es el de lectura: nombre, titular, texto,
+     boton; la marca va por libre, con su propio barrido. */
+  :global(.js) .marca-nombre,
+  :global(.js) .linea > span,
+  :global(.js) .entradilla,
+  :global(.js) .acciones {
+    animation: subir 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  :global(.js) .marca-nombre { animation-delay: 0.1s; }
+  :global(.js) .linea:nth-child(1) > span { animation-delay: 0.2s; }
+  :global(.js) .linea:nth-child(2) > span { animation-delay: 0.3s; }
+  :global(.js) .entradilla { animation-delay: 0.44s; }
+  :global(.js) .acciones { animation-delay: 0.54s; }
 
-  @media (min-width: 981px) {
-    /* Medido, no a ojo: la linea 2 del H1 acaba en x=947 y su caja baja hasta
-       y=342. Con el grupo a 236 px de ancho (347 el conjunto) y el hero a 760,
-       el grupo baja a y 363, por debajo del titular, que acaba en 342. */
-    .hero { padding-bottom: 48px; min-height: 800px; }
-    .titular { max-width: 64rem; }
-    .pie { max-width: 40rem; }
-    /* Anclado abajo a la derecha: solapa el hueco que deja el texto, no el
-       titular ni el boton. Anclarlo por arriba lo hacia depender del alto del
-       H1 y acababa pisandolo. */
-    .flota {
-      position: absolute;
-      bottom: 0;
-      right: max(20px, calc(50% - var(--ancho) / 2));
-      z-index: -1;
+  @keyframes subir {
+    from { opacity: 0; transform: translateY(0.85em); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ── Movil ─────────────────────────────────────────────────────────────── */
+
+  /* La marca pasa arriba, a lo ancho, y el titular debajo. En vertical no hay
+     hueco lateral que valga: o manda el dibujo o manda el texto. */
+  @media (max-width: 980px) {
+    .hero { display: block; min-height: 0; padding: 8px 0 56px; }
+    /* Sin el reset del ancho, el texto heredaria el 46vw de escritorio y el
+       titular saldria en columna de seis lineas. */
+    .texto { max-width: none; }
+    .escena {
+      position: relative;
+      top: auto;
+      right: auto;
+      width: min(92vw, 430px);
+      margin: 0 auto 4px;
+      translate: none;
+      transform: none;
+    }
+    .lanzada {
+      -webkit-mask-image: linear-gradient(48deg, transparent 1%, #000 26%);
+      mask-image: linear-gradient(48deg, transparent 1%, #000 26%);
+    }
+    .pie { margin-top: 28px; gap: 24px; }
+  }
+
+  @media (max-width: 560px) {
+    h1 { font-size: clamp(2.05rem, 8.4vw, 2.6rem); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .lanzada,
+    :global(.js) .marca-nombre,
+    :global(.js) .linea > span,
+    :global(.js) .entradilla,
+    :global(.js) .acciones {
+      animation: none;
     }
   }
-
-  @media (max-width: 980px) {
-    .pie { grid-template-columns: 1fr; gap: 26px; align-items: start; }
-    .flota { display: flex; justify-content: center; margin-top: 40px; }
-  }
-
 </style>

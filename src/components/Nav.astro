@@ -2,6 +2,7 @@
 import { t } from '../i18n/ui';
 import { ruta, type Idioma } from '../i18n/routes';
 import LangSwitch from './LangSwitch.astro';
+import Glifo from './Glifo.astro';
 import { APP } from '../data/app';
 
 interface Props { lang: Idioma; alternas: { es: string; en: string }; }
@@ -20,7 +21,7 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
   <div class="envoltorio">
     <div class="interior" data-nav>
       <a class="marca" href={ruta('home', lang)}>
-        <span class="punto" aria-hidden="true"></span>
+        <Glifo clase="gota-marca" />
         <span>Own Lane</span>
       </a>
 
@@ -130,13 +131,15 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     white-space: nowrap;
     flex: none;
   }
-  .punto {
-    width: 13px;
-    height: 13px;
-    border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%;
-    background: var(--tint);
+  /* La gota del icono, no una bolita generica. A este tamano el corredor
+     entero no se lee, asi que va la version corta de la marca. */
+  .marca :global(.gota-marca) {
+    width: 26px;
     flex: none;
+    color: var(--tint);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
+  .marca:hover :global(.gota-marca) { transform: translateX(2px); }
 
   /* En escritorio el plegable no existe como caja: sus hijos caen directamente
      en la fila de la pildora. */

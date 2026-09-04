@@ -1,0 +1,138 @@
+---
+/* El corredor de tinta, en linea y en currentColor.
+ *
+ * Va en linea y no como <img> por tres motivos: hereda el color (misma pieza en
+ * claro y en oscuro, sin duplicar el fichero), el parpadeo necesita tocar dos
+ * elipses de dentro, y el destello necesita usar la propia silueta de mascara.
+ *
+ * Lleva ids dentro (el trazo, la mascara y el degradado), asi que si hay mas de
+ * una marca en la misma pagina cada una necesita su prefijo: dos ids iguales y
+ * la mascara de la segunda apuntaria a la silueta de la primera.
+ */
+import bruto from '../assets/brand/marca.svg?raw';
+
+interface Props {
+  /** Barrido de luz al entrar, como la tinta mojada del resto del sitio. */
+  destello?: boolean;
+  /** Parpadeo cada pocos segundos. Solo tiene sentido a tamano grande. */
+  parpadeo?: boolean;
+  /** Prefijo de los ids internos. Uno distinto por marca en la misma pagina. */
+  prefijo?: string;
+}
+const { destello = false, parpadeo = false, prefijo = 'ol' } = Astro.props;
+
+const [vx, vy, vw, vh] = (bruto.match(/viewBox="([^"]+)"/)?.[1] ?? '0 0 1 1')
+  .split(/\s+/)
+  .map(Number);
+
+const arte = bruto.replace('id="ol-trazo"', `id="${prefijo}-trazo"`);
+
+/* El destello es un rectangulo con un degradado en banda, recortado a la
+ * silueta con una mascara hecha del propio trazo.
+ *
+ * Dos detalles que cuestan una tarde: la mascara va en userSpaceOnUse, porque
+ * por defecto se recorta a la caja del objeto mas un 10% y se comia el barrido
+ * al entrar y al salir; y el color de las paradas va en `style`, porque var()
+ * no se sustituye dentro de un atributo de presentacion y el degradado salia
+ * negro —invisible sobre la tinta— en vez de blanco. */
+const luz = `
+  <defs>
+    <linearGradient id="${prefijo}-luz" gradientTransform="rotate(22 0.5 0.5)">
+      <stop offset="0.30" style="stop-color:var(--destello)" stop-opacity="0" />
+      <stop offset="0.46" style="stop-color:var(--destello)" stop-opacity="0.14" />
+      <stop offset="0.52" style="stop-color:var(--destello)" stop-opacity="0.32" />
+      <stop offset="0.68" style="stop-color:var(--destello)" stop-opacity="0" />
+    </linearGradient>
+    <mask id="${prefijo}-silueta" maskUnits="userSpaceOnUse" x="${vx}" y="${vy}" width="${vw}" height="${vh}">
+      <use href="#${prefijo}-trazo" fill="#fff" />
+    </mask>
+  </defs>
+  <g class="luz" mask="url(#${prefijo}-silueta)">
+    <rect x="${vx}" y="${vy}" width="${vw}" height="${vh}" fill="url(#${prefijo}-luz)" />
+  </g>`;
+
+const svg = destello ? arte.replace('</svg>', `${luz}\n</svg>`) : arte;
+---
+<div
+  class="corredor"
+  data-brilla={destello ? '' : undefined}
+  data-parpadea={parpadeo ? '' : undefined}
+  set:html={svg}
+/>
+
+{parpadeo && (
+  <script is:inline>
+    (() => {
+      const marca = document.querySelector('[data-parpadea]');
+      if (!marca || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      // Solo parpadea si se la esta viendo: una animacion infinita repintando
+      // un SVG de 700 px fuera de pantalla no la paga nadie.
+      let ala_vista = true;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(
+          ([e]) => { ala_vista = e.isIntersecting; },
+          { threshold: 0.05 }
+        ).observe(marca);
+      }
+
+      const ciclo = () => {
+        setTimeout(() => {
+          if (ala_vista && !document.hidden) {
+            marca.classList.add('parpadeando');
+            setTimeout(() => marca.classList.remove('parpadeando'), 320);
+          }
+          ciclo();
+        }, 3600 + Math.random() * 5200);
+      };
+      ciclo();
+    })();
+  </script>
+)}
+
+<style>
+  /* Ojo: el SVG entra por set:html y NO recibe el atributo de ambito de Astro.
+     De ahi los :global() colgando de .corredor, que si lo lleva. */
+  .corredor {
+    --destello: #fff;
+    color: var(--splash);
+    line-height: 0;
+  }
+  .corredor :global(svg) { width: 100%; height: auto; display: block; }
+
+  /* Sobre tinta blanca un brillo blanco no existe: en oscuro el barrido pasa a
+     ser una sombra. */
+  @media (prefers-color-scheme: dark) {
+    .corredor { --destello: #000; }
+  }
+
+  /* Los parpados: elipses detras del trazo que solo asoman por los agujeros de
+     los ojos. En reposo estan aplastadas a cero (ojo abierto). */
+  .corredor :global(.ojo) {
+    transform: scaleY(0);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .corredor.parpadeando :global(.ojo) { animation: parpadeo 0.32s ease-in-out; }
+  @keyframes parpadeo {
+    0%, 100% { transform: scaleY(0); }
+    35%, 55% { transform: scaleY(1); }
+  }
+
+  /* El barrido de luz: una pasada, cuando la marca entra en pantalla. La clase
+     .brilla la pone Tinta.astro via data-brilla. */
+  .corredor :global(.luz) { opacity: 0; transform-box: fill-box; }
+  :global(.js) .corredor.brilla :global(.luz) {
+    animation: barrido 1.5s cubic-bezier(0.3, 0, 0.2, 1) 1.05s 1 both;
+  }
+  @keyframes barrido {
+    0% { opacity: 0; transform: translateX(-115%); }
+    18% { opacity: 1; }
+    82% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(115%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .corredor :global(.luz) { display: none; }
+    .corredor.parpadeando :global(.ojo) { animation: none; }
+  }
+</style>

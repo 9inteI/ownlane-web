@@ -1,0 +1,20 @@
+---
+/* La gota sola, para tamanos pequenos: barra, pie, listados. El corredor
+ * entero por debajo de unos 40 px se convierte en una mancha ilegible.
+ * Sin ids, asi que se puede repetir tantas veces como haga falta. */
+import bruto from '../assets/brand/glifo.svg?raw';
+
+interface Props { clase?: string; }
+const { clase = '' } = Astro.props;
+---
+<span class:list={['glifo', clase]} set:html={bruto} />
+
+<style>
+  .glifo {
+    display: inline-block;
+    line-height: 0;
+    color: currentColor;
+  }
+  /* El SVG llega por set:html y no lleva el ambito de Astro. */
+  .glifo :global(svg) { width: 100%; height: auto; display: block; }
+</style>
