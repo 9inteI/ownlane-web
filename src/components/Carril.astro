@@ -1,0 +1,109 @@
+---
+/* El carril: una linea fina en el margen izquierdo por la que baja la gota
+ * segun avanza la pagina.
+ *
+ * Es el nombre de la app hecho estructura, no un adorno: la pagina entera es
+ * un carril y la marca lo recorre. Marca ademas las secciones con un tick, asi
+ * que de un vistazo se ve cuantas quedan.
+ *
+ * Solo transform y scaleY, leidos una vez por frame. Por debajo de 1200 px el
+ * margen ya no da de si —la linea se pegaria al texto— y desaparece.
+ */
+import Glifo from './Glifo.astro';
+import { secciones } from '../data/landing';
+
+const total = Object.keys(secciones).length;
+---
+<div class="carril" aria-hidden="true" data-carril>
+  <div class="via">
+    <div class="hecho"></div>
+    {Array.from({ length: total }, (_, i) => (
+      <span class="tick" style={`--i:${(i + 1) / (total + 1)}`}></span>
+    ))}
+  </div>
+  <div class="gota"><Glifo /></div>
+</div>
+
+<script is:inline>
+  (() => {
+    const carril = document.querySelector('[data-carril]');
+    if (!carril) return;
+
+    let pendiente = false;
+    const pintar = () => {
+      pendiente = false;
+      const recorrido = document.documentElement.scrollHeight - innerHeight;
+      const avance = recorrido > 0 ? Math.min(1, Math.max(0, scrollY / recorrido)) : 0;
+      carril.style.setProperty('--avance', avance.toFixed(4));
+    };
+    const alScroll = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(pintar);
+    };
+
+    addEventListener('scroll', alScroll, { passive: true });
+    addEventListener('resize', alScroll, { passive: true });
+    pintar();
+  })();
+</script>
+
+<style>
+  .carril {
+    --avance: 0;
+    position: fixed;
+    /* Fuera del contenedor de contenido mientras quepa; pegado al canto
+       cuando no. */
+    left: max(20px, calc((100vw - var(--ancho)) / 2 - 38px));
+    top: 132px;
+    bottom: 96px;
+    width: 12px;
+    z-index: 30;
+    pointer-events: none;
+  }
+
+  .via {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    margin-left: -0.5px;
+    background: var(--hairline);
+  }
+
+  /* La parte recorrida. scaleY sobre un elemento de altura completa: ni un
+     reflow por frame. */
+  .hecho {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: scaleY(var(--avance));
+    transform-origin: top;
+  }
+
+  .tick {
+    position: absolute;
+    left: -3px;
+    width: 7px;
+    height: 1px;
+    top: calc(var(--i) * 100%);
+    background: var(--line-1);
+  }
+
+  .gota {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--avance) * 100%);
+    width: 26px;
+    margin-left: -14px;
+    translate: 0 -50%;
+    color: var(--splash);
+    /* Apunta hacia abajo: la gota cae por el carril. */
+    rotate: 90deg;
+  }
+
+  @media (max-width: 1199px) {
+    .carril { display: none; }
+  }
+</style>

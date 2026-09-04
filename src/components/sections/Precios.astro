@@ -1,25 +1,42 @@
 ---
+/* 07 · Precio.
+ *
+ * Antes eran dos tarjetas con dos listas del mismo peso y habia que leerlas
+ * enteras para saber cuanto cuesta. Ahora la cifra va primero y a tamano de
+ * titular: la pregunta de esta seccion es "cuanto", y la respuesta se ve sin
+ * leer. Las listas quedan debajo, con filete entre lineas.
+ */
+import Rotulo from '../Rotulo.astro';
 import { precios } from '../../data/landing';
+import { APP } from '../../data/app';
 import { ruta, type Idioma } from '../../i18n/routes';
 
 interface Props { lang: Idioma; }
 const { lang } = Astro.props;
 const c = precios[lang];
+
+// El mensual y la prueba ya los dice `nota` al pie de la tarjeta: aqui solo
+// la cifra de cabecera y su periodo, sin repetir la letra pequena.
+const anual = lang === 'es' ? APP.precios.anual : APP.precios.anualEN;
+const cero = lang === 'es' ? '0 €' : '€0';
+const porAno = lang === 'es' ? 'al año' : 'a year';
+const paraSiempre = lang === 'es' ? 'para siempre' : 'forever';
 ---
 <section class="seccion">
   <div class="envoltorio">
-    <header class="cabecera revelar">
-      <p class="eyebrow">{c.eyebrow}</p>
-      <h2>{c.titulo}</h2>
-    </header>
+    <Rotulo clave="precio" lang={lang} titulo={c.titulo} medida={14} />
 
     <div class="dos">
-      <div class="tarjeta col revelar">
-        <h3>{c.gratisTitulo}</h3>
+      <div class="plan revelar">
+        <header class="tope">
+          <h3>{c.gratisTitulo}</h3>
+          <p class="cifra num">{cero}</p>
+          <p class="periodo">{paraSiempre}</p>
+        </header>
         <ul>
           {c.gratis.map((l) => (
             <li>
-              <span class="marca" aria-hidden="true">
+              <span class="tilde" aria-hidden="true">
                 <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>{l}
             </li>
@@ -27,19 +44,26 @@ const c = precios[lang];
         </ul>
       </div>
 
-      <div class="tarjeta col plus revelar">
-        <h3>{c.plusTitulo}</h3>
+      <div class="plan plus revelar">
+        <header class="tope">
+          <h3>{c.plusTitulo}</h3>
+          <p class="cifra num">{anual}</p>
+          <p class="periodo">{porAno}</p>
+        </header>
         <ul>
           {c.plus.map((l) => (
             <li>
-              <span class="marca" aria-hidden="true">
+              <span class="tilde" aria-hidden="true">
                 <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>{l}
             </li>
           ))}
         </ul>
         <p class="nota">{c.nota}</p>
-        <a class="enlace" href={ruta('plus', lang)}>{c.enlace} →</a>
+        <a class="enlace" href={ruta('plus', lang)}>
+          {c.enlace}
+          <span aria-hidden="true">→</span>
+        </a>
       </div>
     </div>
 
@@ -48,26 +72,85 @@ const c = precios[lang];
 </section>
 
 <style>
-  .seccion { padding: 60px 0; content-visibility: auto; contain-intrinsic-size: auto 620px; }
-  .cabecera { margin-bottom: 28px; }
-  h2 { margin-top: 12px; }
-  .dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-  .col { padding: 28px; display: flex; flex-direction: column; }
+  .seccion {
+    padding: clamp(60px, 8vw, 110px) 0;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+
+  .dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .plan {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(26px, 3vw, 38px);
+    border-radius: 26px;
+    background: var(--card);
+    border: 0.5px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+  }
   .plus { background: var(--inverse-surface); color: var(--inverse-ink); border-color: transparent; }
-  h3 { margin-bottom: 18px; }
-  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
-  li { display: flex; gap: 11px; align-items: flex-start; font-size: 16px; }
-  .marca { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--ink-soft); }
-  .plus .marca { color: var(--inverse-ink); opacity: 0.6; }
-  .marca svg { width: 100%; height: 100%; }
-  .nota { margin-top: 22px; font-size: 14px; color: var(--inverse-ink-soft); }
-  .enlace { margin-top: 12px; font-weight: 600; text-decoration: none; color: inherit; }
-  .enlace:hover { text-decoration: underline; }
-  .remate {
-    margin-top: 26px;
-    font-size: 18px;
+
+  .tope { padding-bottom: clamp(20px, 2.4vw, 28px); margin-bottom: clamp(18px, 2vw, 24px); border-bottom: 1px solid var(--hairline); }
+  .plus .tope { border-color: rgba(255, 255, 255, 0.18); }
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 12px;
     font-weight: 600;
-    max-width: 62ch;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .plus h3 { color: var(--inverse-ink-soft); }
+
+  .cifra {
+    margin-top: 14px;
+    font-size: clamp(2.8rem, 6vw, 4.4rem);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 0.95;
+  }
+  .periodo { margin-top: 10px; font-size: 15px; color: var(--ink-soft); }
+  .plus .periodo { color: var(--inverse-ink-soft); }
+
+  ul { list-style: none; margin: 0; padding: 0; }
+  li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 11px 0;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  li + li { border-top: 1px solid var(--separator); }
+  .plus li + li { border-color: rgba(255, 255, 255, 0.1); }
+  .tilde { width: 17px; height: 17px; flex: none; margin-top: 3px; color: var(--ink-soft); }
+  .plus .tilde { color: var(--inverse-ink); opacity: 0.62; }
+  .tilde svg { width: 100%; height: 100%; }
+
+  .nota { margin-top: 24px; font-size: 14px; color: var(--inverse-ink-soft); }
+  .enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    color: inherit;
+  }
+  .enlace span { transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+  .enlace:hover span { transform: translateX(4px); }
+  .enlace:hover { text-decoration: underline; }
+
+  .remate {
+    margin-top: clamp(30px, 4vw, 46px);
+    padding-top: clamp(20px, 2.4vw, 28px);
+    border-top: 1px solid var(--hairline);
+    font-size: clamp(18px, 1.9vw, 23px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+    max-width: 56ch;
+    text-wrap: balance;
   }
 </style>

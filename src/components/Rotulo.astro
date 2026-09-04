@@ -1,0 +1,88 @@
+---
+/* La cabecera de seccion, igual en toda la portada.
+ *
+ *   ── 03 ────────────────────────── LO QUE SE RECUERDA ──
+ *   Un titular grande
+ *   una entradilla
+ *
+ * El numero en monoespaciada y el filete son la estructura de la pagina: son
+ * lo que convierte una sucesion de bloques en un indice legible. La regla se
+ * dibuja con un borde del propio contenedor, no con un pseudo-elemento suelto,
+ * para que crezca con la rejilla sin medidas magicas.
+ */
+import { secciones, numeroDe, type Seccion } from '../data/landing';
+import type { Idioma } from '../i18n/routes';
+
+interface Props {
+  clave: Seccion;
+  lang: Idioma;
+  /** Opcional: hay secciones donde el titular son las propias cifras. */
+  titulo?: string;
+  entradilla?: string;
+  /** Sobre fondo de tinta, el filete y el numero se aclaran. */
+  invertido?: boolean;
+  /** Ancho maximo del titular, en caracteres. */
+  medida?: number;
+}
+const { clave, lang, titulo, entradilla, invertido = false, medida = 17 } = Astro.props;
+---
+<header class:list={['rotulo', { invertido }]}>
+  <p class="indice">
+    <span class="num">{numeroDe(clave)}</span>
+    <span class="filete" aria-hidden="true"></span>
+    <span class="etiqueta">{secciones[clave][lang]}</span>
+  </p>
+  {titulo && <h2 style={`--medida:${medida}ch`}>{titulo}</h2>}
+  {entradilla && <p class="entradilla">{entradilla}</p>}
+</header>
+
+<style>
+  .rotulo { margin-bottom: clamp(32px, 4vw, 52px); }
+
+  /* Sin titular, el rotulo es solo el filete: no debe dejar hueco doble. */
+  .rotulo:has(.indice:only-child) { margin-bottom: clamp(28px, 3.4vw, 44px); }
+  .rotulo:has(.indice:only-child) .indice { margin-bottom: 0; }
+
+  .indice {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: clamp(20px, 2.4vw, 30px);
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .num { color: var(--ink); font-weight: 600; }
+  /* Empuja la etiqueta al extremo derecho del filete. */
+  .filete { flex: 1; }
+  .etiqueta { text-align: right; }
+
+  h2 {
+    font-size: clamp(2.1rem, 4.4vw, 3.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.038em;
+    max-width: var(--medida);
+    text-wrap: balance;
+  }
+  .entradilla {
+    margin-top: 20px;
+    font-size: clamp(17px, 1.5vw, 20px);
+    color: var(--ink-soft);
+    max-width: 54ch;
+  }
+
+  .invertido .indice { border-color: rgba(255, 255, 255, 0.22); color: var(--inverse-ink-soft); }
+  .invertido .num { color: var(--inverse-ink); }
+  .invertido .entradilla { color: var(--inverse-ink-soft); }
+
+  /* En movil el filete se va al final: la etiqueta cabe al lado del numero y
+     no hay que esconderla. */
+  @media (max-width: 640px) {
+    .indice { font-size: 11px; gap: 10px; }
+    .filete { order: 3; }
+  }
+</style>

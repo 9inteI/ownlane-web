@@ -1,5 +1,16 @@
 ---
+/* 01 · El problema. Bloque de tinta a sangre.
+ *
+ * Aqui el titular son las cifras: "1 de 4" a 9 rem dice el problema mejor que
+ * cualquier frase que se pudiera poner encima, asi que el rotulo va sin titulo
+ * y las dos cifras hacen de display. Debajo, el remate.
+ *
+ * Las cifras entran desde abajo detras de su propia caja recortada, no con un
+ * fundido: el gesto es el de un contador que se levanta, y da direccion a una
+ * seccion que si no seria un rectangulo negro.
+ */
 import EdgeDrip from '../ink/EdgeDrip.astro';
+import Rotulo from '../Rotulo.astro';
 import { dato } from '../../data/landing';
 import type { Idioma } from '../../i18n/routes';
 
@@ -10,16 +21,19 @@ const c = dato[lang];
 <section class="bloque">
   <EdgeDrip variante="a" lado="abajo" />
   <div class="envoltorio interior">
+    <Rotulo clave="problema" lang={lang} invertido />
+
     <div class="cifras">
-      {c.cifras.map((f) => (
-        <div class="cifra">
-          <div class="valor num">{f.valor}</div>
+      {c.cifras.map((f, i) => (
+        <div class="cifra revelar" style={`--r:${i * 0.09}s`}>
+          <div class="valor num"><span>{f.valor}</span></div>
           <div class="etiqueta">{f.etiqueta}</div>
         </div>
       ))}
     </div>
-    <div class="texto">
-      <p>{c.texto}</p>
+
+    <div class="cierre-bloque">
+      <p class="texto">{c.texto}</p>
       <p class="remate">{c.remate}</p>
     </div>
   </div>
@@ -31,34 +45,79 @@ const c = dato[lang];
   .bloque {
     position: relative;
     /* El margen inferior deja sitio al goteo, que cuelga fuera de la caja. */
-    margin: 140px 0 168px;
+    margin: clamp(90px, 12vw, 150px) 0 clamp(120px, 14vw, 180px);
     background: var(--inverse-surface);
     color: var(--inverse-ink);
-    padding: 56px 0;
+    padding: clamp(56px, 7vw, 92px) 0;
   }
-  .interior {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 44px;
-    align-items: center;
-  }
-  .cifras { display: flex; flex-wrap: wrap; gap: 40px; }
-  .valor {
-    font-size: clamp(40px, 6vw, 64px);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1;
-  }
-  .etiqueta {
-    margin-top: 10px;
-    font-size: 14px;
-    color: var(--inverse-ink-soft);
-    max-width: 22ch;
-  }
-  .texto { font-size: 19px; }
-  .remate { margin-top: 14px; font-weight: 600; }
 
-  @media (max-width: 800px) {
-    .interior { grid-template-columns: 1fr; gap: 32px; }
+  /* Las dos cifras, una junto a otra, separadas por un filete vertical. */
+  .cifras {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(24px, 5vw, 72px);
+  }
+  .cifra + .cifra {
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    padding-left: clamp(24px, 5vw, 72px);
+  }
+
+  .valor {
+    font-size: clamp(3.4rem, 10vw, 8.5rem);
+    font-weight: 700;
+    letter-spacing: -0.055em;
+    line-height: 0.9;
+    /* La caja recorta y el span sube desde debajo. */
+    overflow: hidden;
+    padding-bottom: 0.04em;
+  }
+  .valor span { display: block; }
+  :global(.js) .cifra .valor span { transform: translateY(105%); }
+  :global(.js) .cifra.visible .valor span {
+    transform: none;
+    transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) var(--r);
+  }
+
+  .etiqueta {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--inverse-ink-soft);
+    max-width: 26ch;
+  }
+
+  .cierre-bloque {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(24px, 5vw, 72px);
+    margin-top: clamp(44px, 6vw, 80px);
+  }
+  .texto { font-size: clamp(17px, 1.5vw, 19px); color: var(--inverse-ink-soft); max-width: 40ch; }
+  .remate {
+    font-size: clamp(19px, 2vw, 26px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 760px) {
+    .cifras, .cierre-bloque { grid-template-columns: 1fr; }
+    .cifra + .cifra {
+      border-left: 0;
+      padding-left: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      padding-top: 28px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .cifra .valor span { transform: none; }
   }
 </style>

@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Hero from '../sections/Hero.astro';
 import StatBlock from '../sections/StatBlock.astro';
 import Apilado from '../sections/Apilado.astro';
-import Bento from '../sections/Bento.astro';
+import Memoria from '../sections/Memoria.astro';
 import Marquee from '../sections/Marquee.astro';
 import Horizontal from '../sections/Horizontal.astro';
 import Privacy from '../sections/Privacy.astro';
@@ -11,6 +11,7 @@ import Watch from '../sections/Watch.astro';
 import Precios from '../sections/Precios.astro';
 import Cierre from '../sections/Cierre.astro';
 import Movimiento from '../ink/Movimiento.astro';
+import Carril from '../Carril.astro';
 import { APP } from '../../data/app';
 
 import type { Idioma } from '../../i18n/routes';
@@ -57,26 +58,33 @@ const jsonld = {
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonld)} />
 
+  {/* El carril de la izquierda: por donde baja la gota con el avance. */}
+  <Carril />
+
   <Hero lang={lang} />
+
+  <!-- 01 Interest: el problema, en cifras -->
   <StatBlock lang={lang} />
 
-  <!-- Interest: los tres ejes, apilandose al bajar -->
+  <!-- 02 Interest: los tres ejes, apilandose al bajar -->
   <Apilado lang={lang} />
 
-  <!-- Interest: rejilla densa, sin celdas muertas -->
-  <Bento lang={lang} />
+  <!-- 03 Interest: la plancha editorial -->
+  <Memoria lang={lang} />
 
   <!-- Desire: la letania de lo que la app no hace -->
   <Marquee lang={lang} />
 
+  <!-- 04 -->
   <Privacy lang={lang} />
 
-  <!-- Desire: Aprende en scroll horizontal ligado al vertical -->
+  <!-- 05 Desire: Aprende en scroll horizontal ligado al vertical -->
   <Horizontal lang={lang} />
 
+  <!-- 06 -->
   <Watch lang={lang} />
 
-  <!-- Action -->
+  <!-- 07 Action -->
   <Precios lang={lang} />
   <Cierre lang={lang} />
 

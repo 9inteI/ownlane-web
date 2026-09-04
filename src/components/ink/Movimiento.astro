@@ -6,11 +6,15 @@
  *    activado no descarga ni un byte de la libreria.
  * 2. Solo se cargan en las paginas que de verdad piden scroll ligado a
  *    posicion. Un articulo o la pagina de soporte no montan este componente.
+ *
+ * El carrusel de Aprende ya no esta aqui: se pegaba y obligaba a recorrerlo
+ * entero para pasar de largo. Ahora es scroll-snap nativo con flechas, dentro
+ * del propio componente, y no necesita GSAP.
  */
 ---
 <script>
   const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hayTrabajo = document.querySelector('[data-apila], [data-horizontal], [data-escala]');
+  const hayTrabajo = document.querySelector('[data-apila], [data-escala]');
 
   if (!quieto && hayTrabajo) {
     const [{ gsap }, { ScrollTrigger }] = await Promise.all([
@@ -37,12 +41,9 @@
             pin: true,
             pinSpacing: false,
             invalidateOnRefresh: true,
-            // Con varias secciones pinneadas, ScrollTrigger tiene que calcular
-            // las de arriba ANTES que las de abajo. Sin esto, y encima con
-            // pinSpacing:false, la pila altera el alto del documento despues
-            // de que el scroll horizontal haya cacheado su start/end: el
-            // resultado es que la seccion siguiente arranca en el sitio
-            // equivocado y se recoloca sola a mitad de gesto.
+            // Las de arriba se calculan ANTES que las de abajo: con
+            // pinSpacing:false la pila altera el alto del documento, y
+            // cualquier trigger cacheado despues se queda con medidas viejas.
             refreshPriority: 10 - i,
           });
           if (ultima) return;
@@ -57,38 +58,6 @@
               scrub: 0.5,
             },
           });
-        });
-      });
-    });
-
-    // --- Scroll horizontal ---------------------------------------------------
-    // La seccion se pega y la fila se desplaza en X mientras se baja. En movil
-    // no se pega: se deja como carrusel de scroll nativo, que es mejor ahi.
-    mm.add('(min-width: 860px) and (prefers-reduced-motion: no-preference)', () => {
-      document.querySelectorAll<HTMLElement>('[data-horizontal]').forEach((zona) => {
-        const via = zona.querySelector<HTMLElement>('[data-via]');
-        if (!via) return;
-        const carril = via.parentElement;
-        if (!carril) return;
-
-        // El recorrido se mide contra el ancho del CARRIL, que es la ventana
-        // que de verdad se ve: el carril recorta y arranca dentro de la columna
-        // derecha. Midiendolo contra zona.clientWidth salia 576 px corto y las
-        // dos ultimas tarjetas no llegaban a entrar antes de despegarse.
-        const recorrido = () => Math.max(0, via.scrollWidth - carril.clientWidth + 8);
-        gsap.to(via, {
-          x: () => -recorrido(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: zona,
-            start: 'top top',
-            end: () => '+=' + recorrido(),
-            pin: true,
-            scrub: 0.35,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            refreshPriority: 0,
-          },
         });
       });
     });

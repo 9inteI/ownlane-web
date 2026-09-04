@@ -1,9 +1,17 @@
 ---
-/* Los artículos de Aprende, en scroll horizontal ligado al vertical.
- * En movil no se pega: se queda como carrusel de scroll nativo, que ahi
- * funciona mejor que secuestrar el scroll. */
+/* 05 · Los articulos de Aprende, en un carrusel horizontal.
+ *
+ * Antes esta seccion se pegaba y secuestraba el scroll: para pasar de largo
+ * habia que recorrerla entera, quisieras o no. Ahora la pagina baja seguida y
+ * el carrusel es opcional: quien quiera verlos todos tira de las flechas, del
+ * dedo o de la barra; quien no, sigue bajando y no se entera.
+ *
+ * Cero JS de scroll ligado: es overflow-x nativo con scroll-snap. Las flechas
+ * solo llaman a scrollBy, y el filete de avance se pinta con scrollLeft.
+ */
 import { getCollection } from 'astro:content';
 import EvidenceBadge from '../EvidenceBadge.astro';
+import Rotulo from '../Rotulo.astro';
 import { ruta, rutaArticulo, type Idioma } from '../../i18n/routes';
 import { t } from '../../i18n/ui';
 
@@ -18,106 +26,268 @@ const arts = (await getCollection('aprende', (a) => a.data.lang === lang)).sort(
 });
 
 const c = {
-  es: { titulo: 'Lo que está demostrado, y lo que solo se repite', pie: 'Cada artículo cita sus fuentes.', ver: 'Ver todo' },
-  en: { titulo: "What's proven, and what just gets repeated", pie: 'Every article cites its sources.', ver: 'See all' },
+  es: {
+    titulo: 'Lo que está demostrado, y lo que solo se repite',
+    pie: 'Cada artículo cita sus fuentes.',
+    ver: 'Ver todo',
+    lista: 'Artículos de Aprende',
+    atras: 'Anterior',
+    adelante: 'Siguiente',
+  },
+  en: {
+    titulo: "What's proven, and what just gets repeated",
+    pie: 'Every article cites its sources.',
+    ver: 'See all',
+    lista: 'Learn articles',
+    atras: 'Previous',
+    adelante: 'Next',
+  },
 }[lang];
 ---
-<section class="zona" data-horizontal>
-  <div class="marco">
-    <header class="fijo">
-      <h2>{c.titulo}</h2>
-      <p class="pie">{c.pie}</p>
-      <a class="ver" href={ruta('aprende', lang)}>{c.ver} →</a>
-    </header>
+<section class="zona">
+  <div class="envoltorio cabecera">
+    <Rotulo clave="aprende" lang={lang} titulo={c.titulo} entradilla={c.pie} medida={19} />
 
-    <div class="carril">
-      <div class="via" data-via>
-        {arts.map((a) => (
-          <a class="ficha" href={rutaArticulo(a.data.slug, lang)}>
-            <EvidenceBadge nivel={a.data.evidence} lang={lang} compacto />
-            <h3>{a.data.title}</h3>
-            <p>{a.data.teaser}</p>
-            <span class="minutos">{a.data.minutes} {tr('articulo.minutos')}</span>
-          </a>
-        ))}
+    <div class="mandos">
+      <a class="ver" href={ruta('aprende', lang)}>
+        {c.ver}
+        <span aria-hidden="true">→</span>
+      </a>
+      <div class="flechas">
+        <button type="button" class="flecha" data-ir="-1" aria-label={c.atras} aria-controls="carril-aprende">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="flecha" data-ir="1" aria-label={c.adelante} aria-controls="carril-aprende">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
+    </div>
+
+    <div class="avance" aria-hidden="true"><span></span></div>
+  </div>
+
+  <div
+    class="carril"
+    id="carril-aprende"
+    data-carrusel
+    tabindex="0"
+    role="group"
+    aria-label={c.lista}
+  >
+    <div class="via">
+      {arts.map((a, i) => (
+        <a class="ficha" href={rutaArticulo(a.data.slug, lang)}>
+          <p class="alto">
+            <span class="orden">{String(i + 1).padStart(2, '0')}</span>
+            <EvidenceBadge nivel={a.data.evidence} lang={lang} compacto />
+          </p>
+          <h3>{a.data.title}</h3>
+          <p class="teaser">{a.data.teaser}</p>
+          <span class="minutos">{a.data.minutes} {tr('articulo.minutos')}</span>
+        </a>
+      ))}
     </div>
   </div>
 </section>
 
+<script is:inline>
+  (() => {
+    const carril = document.querySelector('[data-carrusel]');
+    if (!carril) return;
+    const seccion = carril.closest('section');
+    const flechas = [...seccion.querySelectorAll('[data-ir]')];
+    const ficha = carril.querySelector('a');
+
+    // Un salto = una tarjeta. Se mide en vivo porque el ancho cambia con el
+    // viewport y con el zoom del navegador.
+    const paso = () => (ficha ? ficha.getBoundingClientRect().width + 14 : 320);
+
+    const pintar = () => {
+      const resto = carril.scrollWidth - carril.clientWidth;
+      const avance = resto > 4 ? carril.scrollLeft / resto : 1;
+      seccion.style.setProperty('--avance', String(avance));
+      // En los extremos la flecha se apaga: pulsarla no haria nada y eso se
+      // avisa antes, no despues.
+      flechas.forEach((b) => {
+        const fin = Number(b.dataset.ir) > 0 ? avance > 0.995 : avance < 0.005;
+        b.disabled = resto <= 4 || fin;
+      });
+    };
+
+    flechas.forEach((b) =>
+      b.addEventListener('click', () =>
+        carril.scrollBy({ left: Number(b.dataset.ir) * paso(), behavior: 'smooth' })
+      )
+    );
+
+    let pendiente = false;
+    carril.addEventListener(
+      'scroll',
+      () => {
+        if (pendiente) return;
+        pendiente = true;
+        requestAnimationFrame(() => { pendiente = false; pintar(); });
+      },
+      { passive: true }
+    );
+    addEventListener('resize', pintar, { passive: true });
+    pintar();
+  })();
+</script>
+
 <style>
-  /* La zona pinneada tiene que medir EXACTAMENTE una pantalla. Con 78vh, al
-     pegarse quedaba una franja por debajo enseñando ya la seccion siguiente:
-     eso era el corte. Sin padding en .zona por la misma razon. */
-  .zona { padding: 0; overflow: hidden; }
-  .marco {
-    display: grid;
-    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
-    gap: 40px;
-    align-items: center;
-    width: 100%;
-    max-width: var(--ancho);
-    margin-inline: auto;
-    /* Simetrico a proposito: con 104 arriba y 48 abajo el bloque quedaba 56 px
-       descentrado y se leia como "pegado arriba". El de arriba deja pasar la
-       nav flotante (54 de alto + 14 de hueco). */
-    padding: 96px 20px;
-    align-content: center;
-    min-height: 100vh;
-    min-height: 100dvh;
+  .zona {
+    --avance: 0;
+    padding: clamp(60px, 8vw, 110px) 0;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 620px;
   }
-  h2 { font-size: clamp(1.9rem, 3.4vw, 3rem); letter-spacing: -0.03em; max-width: 16ch; }
-  .pie { margin-top: 16px; color: var(--ink-soft); }
-  .ver { display: inline-block; margin-top: 20px; font-weight: 600; text-decoration: none; }
+
+  /* Titular a la izquierda, mandos a la derecha, en la misma linea de base. */
+  .cabecera {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 24px;
+  }
+  .cabecera > :global(.rotulo) { margin-bottom: 0; }
+
+  .mandos { display: flex; align-items: center; gap: 20px; padding-bottom: 4px; }
+
+  .ver {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .ver span { transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+  .ver:hover span { transform: translateX(4px); }
   .ver:hover { text-decoration: underline; }
 
-  /* El carril RECORTA. Sin esto las tarjetas se deslizaban por encima de la
-     columna del titular y lo tapaban a mitad de recorrido. Se sangra hasta el
-     borde derecho de la ventana para que sigan entrando desde fuera. */
-  .carril {
-    overflow: hidden;
-    width: calc(100% + max(20px, (100vw - var(--ancho)) / 2 + 20px));
-    padding-block: 8px;
-    margin-block: -8px;
+  .flechas { display: flex; gap: 8px; }
+  .flecha {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0.5px solid var(--card-border);
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    transition: var(--press), opacity 0.2s ease-out;
   }
-  .via { display: flex; gap: 16px; width: max-content; }
+  .flecha svg { width: 21px; height: 21px; }
+  .flecha:hover { background: var(--fill-1); }
+  .flecha:active { transform: scale(0.94); }
+  .flecha:disabled { opacity: 0.32; cursor: default; }
+  .flecha:disabled:hover { background: var(--card); }
+
+  /* Cuanto queda de carrusel. Se pinta con scrollLeft, no con el scroll de la
+     pagina: aqui el avance es el del carril. */
+  .avance {
+    position: relative;
+    grid-column: 1 / -1;
+    height: 1px;
+    margin-top: clamp(24px, 3vw, 36px);
+    background: var(--hairline);
+    overflow: hidden;
+  }
+  .avance span {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    /* La barra ocupa un tercio y recorre el otro 67%: un filete proporcional
+       al contenido seria de 5 px y no se veria. */
+    transform: translateX(calc(var(--avance) * 67%)) scaleX(0.33);
+    transform-origin: left;
+    transition: transform 0.18s linear;
+  }
+
+  /* El carril sangra a los dos cantos de la ventana, pero la primera tarjeta
+     empieza alineada con el contenedor: el padding lo iguala. */
+  .carril {
+    /* La misma sangria en padding y en scroll-padding. Sin el scroll-padding,
+       el snap alineaba la primera tarjeta con el canto de la ventana y el
+       carrusel arrancaba ya desplazado 180 px. */
+    --sangria: max(20px, calc((100vw - var(--ancho)) / 2 + 20px));
+    margin-top: clamp(22px, 2.6vw, 34px);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--sangria);
+    scrollbar-width: none;
+    padding: 10px var(--sangria) 22px;
+  }
+  .carril::-webkit-scrollbar { display: none; }
+  .carril:focus-visible { outline-offset: -3px; }
+
+  .via { display: flex; gap: 14px; width: max-content; }
 
   .ficha {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    width: 290px;
-    min-height: 300px;
+    gap: 14px;
+    width: 300px;
+    min-height: 330px;
     padding: 24px;
-    border-radius: var(--radius-card);
+    border-radius: 22px;
     background: var(--card);
     border: 0.5px solid var(--card-border);
     box-shadow: var(--card-shadow);
     text-decoration: none;
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    scroll-snap-align: start;
+    transition:
+      transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.38s ease-out;
   }
-  .ficha:hover { transform: translateY(-4px); }
-  .ficha h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
-  .ficha p { font-size: 15px; color: var(--ink-soft); }
-  .minutos { margin-top: auto; font-size: 12px; color: var(--ink-soft); }
+  .ficha:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    .ficha:hover { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6); }
+  }
 
-  @media (max-width: 859px) {
-    .marco {
-      grid-template-columns: 1fr;
-      gap: 26px;
-      min-height: 0;
-      padding: 40px 20px;
-    }
-    /* Sin pin: carrusel de scroll nativo, con el gesto que ya espera el dedo. */
-    .carril {
-      width: auto;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      margin-inline: -20px;
-      padding: 4px 20px 18px;
-      scrollbar-width: none;
-    }
-    .carril::-webkit-scrollbar { display: none; }
-    .ficha { scroll-snap-align: start; width: 74vw; max-width: 300px; }
+  .alto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 13px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .orden {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+  }
+
+  .ficha h3 {
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.16;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+  .teaser { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+  .minutos {
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 760px) {
+    .cabecera { grid-template-columns: 1fr; align-items: start; }
+    .mandos { justify-content: space-between; padding-bottom: 0; }
+    .ficha { width: 76vw; max-width: 300px; }
   }
 </style>

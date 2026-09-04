@@ -11,7 +11,7 @@
 import { APP } from '../data/app';
 import type { Idioma } from '../i18n/routes';
 
-interface Props { lang: Idioma; variante?: 'lleno' | 'suave'; clase?: string; }
+interface Props { lang: Idioma; variante?: 'lleno' | 'suave' | 'inverso'; clase?: string; }
 const { lang, variante = 'lleno', clase = '' } = Astro.props;
 
 const texto = lang === 'es' ? 'Descárgalo en el App Store' : 'Download on the App Store';
@@ -38,6 +38,9 @@ const sub = lang === 'es' ? 'Gratis · iPhone y Apple Watch' : 'Free · iPhone a
   .pildora:active { transform: scale(0.965); opacity: 0.86; }
   .lleno { background: var(--tint); color: var(--on-tint); box-shadow: var(--glow); }
   .suave { background: var(--fill-2); color: var(--ink); }
+  /* Sobre un bloque de tinta: la pildora se da la vuelta con los mismos
+     tokens del bloque, no con colores nuevos. */
+  .inverso { background: var(--inverse-ink); color: var(--inverse-surface); }
   .texto { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
   .sub { font-size: 12px; opacity: 0.72; }
 </style>

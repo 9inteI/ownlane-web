@@ -1,8 +1,16 @@
 ---
-/* Los tres ejes de mensaje, apilandose uno sobre otro al bajar.
+/* 02 · Los tres ejes de mensaje, apilandose uno sobre otro al bajar.
  * El pin lo hace GSAP (data-apila / data-ficha); sin JS o con reduced-motion
- * quedan como tres tarjetas normales una detras de otra, que se leen igual. */
+ * quedan como tres tarjetas normales una detras de otra, que se leen igual.
+ *
+ * Cada ficha lleva su propio numero de carril (01/02/03 dentro de la seccion)
+ * en monoespaciada, sobre un filete: es la misma estructura que el rotulo de
+ * seccion, un escalon mas abajo, y hace que la pila se lea como un indice y no
+ * como tres tarjetas sueltas.
+ */
 import GrupoDispositivos from '../GrupoDispositivos.astro';
+import Rotulo from '../Rotulo.astro';
+import InkSplash from '../ink/InkSplash.astro';
 import { ejes } from '../../data/landing';
 import { captura } from '../../data/capturas';
 import type { Idioma } from '../../i18n/routes';
@@ -21,54 +29,103 @@ const fichas = [
   { bloque: ejes.salida[lang], piezas: [detalle] },
 ];
 ---
-<section class="pila" data-apila>
-  {fichas.map(({ bloque, piezas }, i) => (
-    <article class="ficha" data-ficha style={`--i:${i}`}>
-      <div class="dentro">
-        <div class="texto">
-          <h2>{bloque.titulo}</h2>
-          {bloque.cuerpo.map((p) => <p>{p}</p>)}
+<section class="zona">
+  <div class="envoltorio">
+    {/* Sin titular: los tres titulares de las fichas ya son el argumento, y
+        uno mas encima solo lo diluiria. */}
+    <Rotulo clave="metodo" lang={lang} />
+  </div>
+
+  <div class="pila" data-apila>
+    {fichas.map(({ bloque, piezas }, i) => (
+      <article class="ficha" data-ficha style={`--i:${i}`}>
+        <div class="dentro">
+          <div class="texto">
+            <p class="indice">
+              <span class="num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="etiqueta">{bloque.eyebrow}</span>
+            </p>
+            <h2>{bloque.titulo}</h2>
+            {bloque.cuerpo.map((p) => <p class="parrafo">{p}</p>)}
+          </div>
+          <div class="moviles">
+            <InkSplash
+              variante={((i % 3) + 1) as 1 | 2 | 3}
+              opacidad={0.07}
+              tam="min(380px, 130%)"
+              estilo="top:50%;left:50%;translate:-50% -50%"
+            />
+            <GrupoDispositivos
+              ancho={piezas.length > 1 ? 214 : 236}
+              piezas={piezas.map((p) => ({ src: p.claro, srcOscuro: p.oscuro, alt: p.alt }))}
+            />
+          </div>
         </div>
-        <div class="moviles">
-          <GrupoDispositivos
-            ancho={piezas.length > 1 ? 214 : 236}
-            piezas={piezas.map((p) => ({ src: p.claro, srcOscuro: p.oscuro, alt: p.alt }))}
-          />
-        </div>
-      </div>
-    </article>
-  ))}
+      </article>
+    ))}
+  </div>
 </section>
 
 <style>
-  .pila { padding: 24px 0 40px; }
+  .zona { padding: clamp(20px, 3vw, 40px) 0 clamp(40px, 6vw, 72px); }
+  .pila { padding-top: clamp(8px, 1.4vw, 18px); }
   .ficha { will-change: transform; }
   .ficha + .ficha { margin-top: 22px; }
 
   .dentro {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
-    gap: 40px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+    gap: clamp(28px, 4vw, 56px);
     align-items: center;
     width: 100%;
     max-width: var(--ancho);
     margin-inline: auto;
-    padding: 40px 34px;
-    border-radius: 26px;
+    padding: clamp(30px, 4vw, 52px) clamp(22px, 3vw, 44px);
+    border-radius: 28px;
     background: var(--card);
     border: 0.5px solid var(--card-border);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.09);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1);
   }
   @media (prefers-color-scheme: dark) {
-    .dentro { box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6); }
+    .dentro { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.62); }
   }
 
-  h2 { font-size: clamp(1.8rem, 3.2vw, 2.8rem); letter-spacing: -0.03em; max-width: 15ch; }
-  .texto p { margin-top: 16px; font-size: 17px; color: var(--ink-soft); max-width: 48ch; }
-  .moviles { justify-self: center; }
+  .indice {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 13px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .num { font-weight: 600; color: var(--ink); }
+
+  /* h2 y no h3: como el rotulo de esta seccion va sin titulo, el titular de
+     cada ficha ES el encabezado de nivel dos del bloque. */
+  h2 {
+    font-size: clamp(1.8rem, 3.2vw, 2.7rem);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    max-width: 15ch;
+    text-wrap: balance;
+  }
+  .parrafo { margin-top: 16px; font-size: 17px; color: var(--ink-soft); max-width: 46ch; }
+
+  /* La mancha va detras de los moviles, dentro de la tarjeta: el recorte lo
+     pone el radio de .dentro, no una caja aparte. */
+  .moviles { position: relative; justify-self: center; isolation: isolate; }
+  .moviles > :global(.mancha) { z-index: -1; }
 
   @media (max-width: 900px) {
-    .dentro { grid-template-columns: 1fr; gap: 30px; padding: 30px 22px; }
+    .dentro { grid-template-columns: 1fr; gap: 30px; }
     .ficha + .ficha { margin-top: 16px; }
+    h2 { max-width: 18ch; }
   }
 </style>

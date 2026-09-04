@@ -291,3 +291,22 @@ export const cierre: Bilingue<{ titulo: string; texto: string }> = {
     texto: 'Free on the App Store. No account, and nothing leaves your phone.',
   },
 };
+
+/** Rotulo de cada seccion de la portada: el numero de carril y su nombre.
+ *  El orden de las claves ES el orden de la pagina, y de ahi sale el numero,
+ *  asi que mover una seccion en Inicio.astro basta con moverla aqui. */
+export const secciones = {
+  problema: { es: 'El problema', en: 'The problem' },
+  metodo: { es: 'Cómo funciona', en: 'How it works' },
+  memoria: { es: 'Tu progreso', en: 'Your progress' },
+  privacidad: { es: 'Sin red social', en: 'No social network' },
+  aprende: { es: 'Aprende', en: 'Learn' },
+  reloj: { es: 'Apple Watch', en: 'Apple Watch' },
+  precio: { es: 'Gratis, siempre', en: 'Free, always' },
+} as const;
+
+export type Seccion = keyof typeof secciones;
+
+/** 01, 02, 03… en el orden de arriba. */
+export const numeroDe = (clave: Seccion): string =>
+  String(Object.keys(secciones).indexOf(clave) + 1).padStart(2, '0');

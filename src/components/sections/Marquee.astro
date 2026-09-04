@@ -1,9 +1,20 @@
 ---
-/* Cinta infinita con lo que la app NO hace. Es el argumento de venta escrito
- * como una letania, que es donde una cinta tiene sentido y no de adorno.
+/* Cinta con lo que la app NO hace. Es el argumento de venta escrito como una
+ * letania, que es donde una cinta tiene sentido y no de adorno.
  *
- * Dos copias de la lista, una marcada aria-hidden: el lector de pantalla lee
- * la frase una vez, no dos. */
+ * Dos carriles cruzados, uno hacia cada lado, y las palabras en hueco: lo que
+ * se enumera son ausencias, asi que la tipografia va vaciada y solo la gota
+ * que separa va en tinta maciza. Si el navegador no sabe hacer el contorno,
+ * @supports deja el texto relleno y se lee igual.
+ *
+ * Dos copias por carril, una marcada aria-hidden: el lector de pantalla lee la
+ * lista una vez, no dos.
+ *
+ * La gota va como <symbol> + <use> y no como SVG suelto: son 32 separadores en
+ * pantalla y meter el trazo entero 32 veces son 260 kB de HTML. Asi el trazo
+ * esta una sola vez y cada separador son 40 bytes.
+ */
+import glifo from '../../assets/brand/glifo.svg?raw';
 import type { Idioma } from '../../i18n/routes';
 
 interface Props { lang: Idioma; }
@@ -13,65 +24,97 @@ const piezas = {
   es: ['Sin feed', 'Sin kudos', 'Sin seguidores', 'Sin cuenta', 'Sin servidor', 'Sin analítica', 'Sin anuncios', 'Sin nadie mirándote'],
   en: ['No feed', 'No kudos', 'No followers', 'No account', 'No server', 'No analytics', 'No ads', 'Nobody watching'],
 }[lang];
+
+// El segundo carril arranca por la mitad de la lista: cruzadas, las dos filas
+// nunca ensenan la misma palabra a la misma altura.
+const carriles = [piezas, [...piezas.slice(4), ...piezas.slice(0, 4)]];
+
+const caja = glifo.match(/viewBox="([^"]+)"/)?.[1] ?? '0 0 1 1';
+const trazo = glifo.slice(glifo.indexOf('<g '), glifo.lastIndexOf('</svg>'));
 ---
 <section class="cinta" aria-label={lang === 'es' ? 'Lo que la app no hace' : "What the app doesn't do"}>
-  <div class="via">
-    {[0, 1].map((copia) => (
-      <ul class="tira" aria-hidden={copia === 1 ? 'true' : undefined}>
-        {piezas.map((p) => (
-          <li>
-            <span class="punto" aria-hidden="true"></span>
-            {p}
-          </li>
-        ))}
-      </ul>
-    ))}
-  </div>
+  <svg class="molde" aria-hidden="true" focusable="false">
+    <symbol id="cinta-gota" viewBox={caja} set:html={trazo} />
+  </svg>
+  {carriles.map((lista, carril) => (
+    <div class:list={['via', { vuelta: carril === 1 }]}>
+      {[0, 1].map((copia) => (
+        <ul class="tira" aria-hidden={copia === 1 || carril === 1 ? 'true' : undefined}>
+          {lista.map((p) => (
+            <li>
+              <svg class="separador" viewBox={caja} fill="currentColor" aria-hidden="true" focusable="false">
+                <use href="#cinta-gota" />
+              </svg>
+              <span class="palabra">{p}</span>
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+  ))}
 </section>
 
 <style>
   .cinta {
     position: relative;
     overflow: hidden;
-    padding: 26px 0;
-    border-block: 0.5px solid var(--separator);
+    display: grid;
+    gap: clamp(2px, 0.6vw, 10px);
+    padding: clamp(30px, 4vw, 52px) 0;
+    border-block: 1px solid var(--hairline);
     /* Se desvanece por los cantos en vez de cortarse en seco. */
-    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   }
-  .via { display: flex; width: max-content; animation: correr 34s linear infinite; }
+
+  .via { display: flex; width: max-content; animation: correr 40s linear infinite; }
+  .vuelta { animation-name: volver; animation-duration: 52s; }
+
   .tira {
     display: flex;
     align-items: center;
-    gap: 46px;
     list-style: none;
     margin: 0;
-    padding: 0 23px;
+    padding: 0;
   }
   li {
     display: flex;
     align-items: center;
-    gap: 16px;
-    font-size: clamp(1.35rem, 2.4vw, 2.1rem);
-    font-weight: 600;
-    letter-spacing: -0.025em;
+    gap: clamp(18px, 2vw, 34px);
+    padding-right: clamp(18px, 2vw, 34px);
+    font-size: clamp(1.7rem, 4.6vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
     white-space: nowrap;
-    color: var(--ink-soft-lg);
   }
-  .punto {
-    width: 9px;
-    height: 9px;
-    border-radius: 50% 44% 54% 46% / 46% 54% 44% 50%;
-    background: var(--tint);
+
+  .palabra { color: var(--ink-soft-lg); }
+  /* El contorno solo si el navegador sabe dibujarlo. */
+  @supports (-webkit-text-stroke: 1px currentColor) {
+    .palabra {
+      color: transparent;
+      -webkit-text-stroke: 1px var(--line-2);
+    }
+  }
+
+  .molde { position: absolute; width: 0; height: 0; }
+  .separador {
+    width: clamp(26px, 2.6vw, 40px);
+    height: auto;
+    color: var(--splash);
+    opacity: 0.85;
     flex: none;
   }
-  @keyframes correr {
-    to { transform: translateX(-50%); }
-  }
+
+  @keyframes correr { to { transform: translateX(-50%); } }
+  @keyframes volver { from { transform: translateX(-50%); } to { transform: none; } }
+
   .cinta:hover .via { animation-play-state: paused; }
 
   @media (prefers-reduced-motion: reduce) {
     .via { animation: none; }
+    /* Sin movimiento, la segunda fila repetiria la lista sin aportar nada. */
+    .vuelta { display: none; }
     .cinta { mask-image: none; -webkit-mask-image: none; overflow-x: auto; }
   }
 </style>

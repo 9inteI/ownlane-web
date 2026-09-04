@@ -1,6 +1,18 @@
 ---
+/* El cierre. Bloque de tinta a sangre, con la marca saliendo por la derecha.
+ *
+ * Es el reverso del hero: alli el corredor llega en negro sobre papel; aqui se
+ * va en blanco sobre tinta. Misma pieza, mismo gesto, invertido, y con eso la
+ * pagina se cierra donde se abrio.
+ *
+ * El goteo cuelga del canto de abajo, como en el bloque de cifras: la tinta se
+ * derrama hacia el pie y la pagina no termina en una linea recta. Puesto
+ * arriba, la misma gota del reves se lee como un objeto colgando, no como
+ * tinta cayendo.
+ */
 import AppStoreBadge from '../AppStoreBadge.astro';
-import Splatter from '../ink/Splatter.astro';
+import EdgeDrip from '../ink/EdgeDrip.astro';
+import Marca from '../Marca.astro';
 import { cierre } from '../../data/landing';
 import type { Idioma } from '../../i18n/routes';
 
@@ -9,25 +21,71 @@ const { lang } = Astro.props;
 const c = cierre[lang];
 ---
 <section class="cierre">
-  <Splatter
-    variante={3}
-    tam="min(620px, 80vw)"
-    opacidad={0.1}
-    brillo
-    parallax={0.07}
-    estilo="top:-170px;left:50%;--tx:-50%"
-  />
-  <div class="envoltorio centro">
-    <h2>{c.titulo}</h2>
-    <p class="texto">{c.texto}</p>
-    <div class="accion"><AppStoreBadge lang={lang} /></div>
+  <EdgeDrip variante="b" lado="abajo" color="var(--inverse-surface)" />
+
+  {/* El recorte va aqui y no en la seccion: con overflow en <section> el
+      goteo del canto de arriba, que cuelga por fuera, se cortaba. */}
+  <div class="fondo" aria-hidden="true">
+    <div class="marca-fuga" data-parallax="0.05">
+      <Marca prefijo="fin" />
+    </div>
+  </div>
+
+  <div class="envoltorio interior">
+    <h2 class="revelar">{c.titulo}</h2>
+    <p class="texto revelar">{c.texto}</p>
+    <div class="accion revelar"><AppStoreBadge lang={lang} variante="inverso" /></div>
   </div>
 </section>
 
 <style>
-  .cierre { position: relative; overflow: clip; padding: 96px 0 40px; text-align: center; }
-  .centro { display: grid; justify-items: center; }
-  h2 { font-size: clamp(30px, 5vw, 46px); }
-  .texto { margin-top: 16px; font-size: 18px; color: var(--ink-soft); max-width: 44ch; }
-  .accion { margin-top: 30px; }
+  .cierre {
+    position: relative;
+    isolation: isolate;
+    margin-top: clamp(90px, 12vw, 150px);
+    padding: clamp(80px, 11vw, 150px) 0 clamp(70px, 9vw, 120px);
+    background: var(--inverse-surface);
+    color: var(--inverse-ink);
+  }
+
+  .interior { position: relative; z-index: 2; max-width: 60rem; }
+
+  h2 {
+    font-size: clamp(2.4rem, 6.4vw, 5.2rem);
+    line-height: 0.99;
+    letter-spacing: -0.045em;
+    max-width: 14ch;
+    text-wrap: balance;
+  }
+  .texto {
+    margin-top: clamp(20px, 2.4vw, 30px);
+    font-size: clamp(17px, 1.7vw, 21px);
+    color: var(--inverse-ink-soft);
+    max-width: 42ch;
+  }
+  .accion { margin-top: clamp(28px, 3.4vw, 42px); }
+
+  .fondo { position: absolute; inset: 0; overflow: clip; z-index: 0; }
+
+  /* La marca, saliendo. Va en el color del texto invertido y se disuelve por
+     la cola, igual que en el hero pero al reves de contraste. */
+  .marca-fuga {
+    position: absolute;
+    right: max(-8vw, -120px);
+    bottom: -14%;
+    width: min(52vw, 640px);
+    z-index: 0;
+    color: var(--inverse-ink);
+    opacity: 0.15;
+    transform: translate(calc(var(--desvio, 0px) * -0.6), var(--desvio, 0px));
+    -webkit-mask-image: linear-gradient(62deg, transparent 4%, #000 42%);
+    mask-image: linear-gradient(62deg, transparent 4%, #000 42%);
+    pointer-events: none;
+  }
+  .marca-fuga :global(.corredor) { color: inherit; }
+
+  @media (max-width: 860px) {
+    .marca-fuga { width: min(88vw, 460px); right: -18vw; bottom: -8%; opacity: 0.12; }
+    h2 { max-width: 12ch; }
+  }
 </style>
