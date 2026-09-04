@@ -1,0 +1,143 @@
+---
+/* Pagina estacional. Solo en espanol: la San Silvestre es una carrera de aqui
+ * y en ingles no hay busqueda que la sostenga. Sin `pagina` ni `alternas` a
+ * proposito: asi Head no emite hreflang hacia una traduccion que no existe.
+ * A esta pagina apuntan el In-App Event de octubre, los clips y el texto
+ * promocional de la ficha; por eso el canal del boton es `sansilvestre`. */
+import Prose from '../layouts/Prose.astro';
+import Callout from '../components/Callout.astro';
+import AppStoreBadge from '../components/AppStoreBadge.astro';
+import { ruta } from '../i18n/routes';
+
+const titulo = 'Tu primera San Silvestre, desde cero en doce semanas · Own Lane';
+const descripcion =
+  'Cómo llegar corriendo al 31 de diciembre empezando de cero: doce semanas con tirada larga, días suaves y semanas de descarga. El plan entero es gratis.';
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuándo hay que empezar a entrenar para la San Silvestre?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para doce semanas, el 8 de octubre como muy tarde. Si empiezas después, la app dimensiona el plan al tiempo que queda y te dice si la fecha da o no.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué meta me pongo si nunca he corrido?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Correr treinta minutos seguidos. Es lo que de verdad quiere casi todo el mundo al empezar y llega para terminar una San Silvestre de 5K. Si ya corres treinta minutos, 10K.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta el plan?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Nada. El plan entero hasta tu meta es gratis, con GPS, mapa, parciales e historial. Own Lane Plus es opcional.',
+      },
+    },
+  ],
+};
+---
+<Prose
+  lang="es"
+  titulo={titulo}
+  descripcion={descripcion}
+  h1="Tu primera San Silvestre, desde cero"
+  entradilla="Doce semanas hasta el 31 de diciembre. Un plan que pregunta cómo te has sentido y se recoloca cuando fallas un día."
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonld)} />
+
+  <p>
+    La San Silvestre es la carrera con más gente que corre por primera vez. Es el 31 de
+    diciembre, en casi todas las ciudades, y la mayoría son de 10K o de 5K. Es un buen
+    objetivo para empezar por una razón sencilla: tiene fecha, y una fecha manda más que
+    cualquier propósito.
+  </p>
+
+  <h2>Cuándo empezar</h2>
+  <p>
+    Doce semanas es el margen cómodo para pasar de cero a correr treinta minutos seguidos.
+    Contando hacia atrás desde el 31 de diciembre, eso es empezar <strong>el 8 de octubre
+    como muy tarde</strong>.
+  </p>
+  <p>
+    Si llegas después, no es que no se pueda. Pones la fecha en Own Lane y el plan se
+    dimensiona a las semanas que quedan. Y si de verdad no da tiempo para la meta que has
+    elegido, te lo dice, en vez de dejarte creer que llegas.
+  </p>
+
+  <h2>Qué meta ponerte</h2>
+  <ul>
+    <li>
+      <strong>Si nunca has corrido:</strong> treinta minutos seguidos. Es lo que de verdad
+      quiere casi todo el mundo al empezar, y con eso terminas una San Silvestre de 5K.
+    </li>
+    <li>
+      <strong>Si ya aguantas treinta minutos:</strong> 10K. Own Lane no te trata como
+      principiante si no lo eres: hay dos niveles de partida para quien ya corre.
+    </li>
+  </ul>
+
+  <h2>Cómo son las doce semanas</h2>
+  <p>
+    Las primeras salidas son bloques de andar y correr, sin pensar: la app te dice cuándo
+    toca cada cosa. Cada semana tiene una tirada larga que sostiene el resto, días suaves
+    alrededor, y cada cuatro semanas la carga baja a propósito, porque el cuerpo se adapta
+    en el descanso y no en el esfuerzo.
+  </p>
+  <p>
+    Durante la salida no hace falta pulsómetro ni ritmo objetivo. La prueba del habla: si
+    puedes decir una frase entera, vas bien. Si no, afloja. Si tienes que andar para poder
+    hablar, anda. No se rompe nada.
+  </p>
+
+  <Callout>Pon la fecha: 31 de diciembre. Marca tus días. El resto lo dimensiona el plan.</Callout>
+
+  <h2>Por qué la mayoría lo deja, y qué hace la app con eso</h2>
+  <p>
+    Solo una de cada cuatro personas termina un plan de iniciación. Casi todas lo dejan
+    entre la segunda y la quinta semana, y casi siempre por lo mismo: una progresión
+    demasiado agresiva, o una lesión.
+  </p>
+  <p>
+    Por eso, después de cada salida, Own Lane pregunta una sola cosa: cómo te has sentido.
+    Si la sesión te sobró, el plan sube antes. Si te machacó, baja un escalón. Si algo te
+    duele, el dolor mueve el plan. Y si fallas el martes, el plan se recoloca: no te
+    castiga ni te pide que repitas la semana entera.
+  </p>
+  <p>
+    No hay feed, ni kudos, ni tabla que te compare con nadie. En la pantalla de tu progreso
+    solo estás tú.
+  </p>
+
+  <h2>Cuánto cuesta</h2>
+  <p>
+    El plan entero hasta tu meta es gratis: elegir tus días, grabar las salidas con mapa y
+    parciales, los avisos, el historial y los hitos. <a href={ruta('plus', 'es')}>Own Lane
+    Plus</a> es opcional y añade la fuerza guiada, el calentamiento, la lectura de cada
+    salida y el día de la carrera: tu ritmo kilómetro a kilómetro, qué comer y qué hacer si
+    va mal.
+  </p>
+
+  <div class="descarga">
+    <AppStoreBadge lang="es" ct="sansilvestre" />
+    <p class="sutil">Sin cuenta y sin servidor: tus datos se quedan en tu móvil.</p>
+  </div>
+
+  <p class="sutil aviso">
+    Own Lane no sustituye a un médico ni a un fisioterapeuta. Si algo te duele, para y
+    consúltalo. Los días de descanso del plan no son opcionales.
+  </p>
+</Prose>
+
+<style>
+  .descarga { margin-top: 2.4em; display: grid; gap: 14px; justify-items: start; }
+  .descarga p { font-size: 15px; max-width: 46ch; }
+  .aviso { margin-top: 2.4em; font-size: 14px; }
+</style>

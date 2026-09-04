@@ -45,8 +45,8 @@ const jsonld = {
   description: meta[lang].descripcion,
   offers: [
     { '@type': 'Offer', price: '0', priceCurrency: 'EUR', name: 'Own Lane' },
-    { '@type': 'Offer', price: '49.00', priceCurrency: 'EUR', name: 'Own Lane Plus (yearly)' },
-    { '@type': 'Offer', price: '4.99', priceCurrency: 'EUR', name: 'Own Lane Plus (monthly)' },
+    { '@type': 'Offer', price: APP.precios.anualEUR, priceCurrency: 'EUR', name: 'Own Lane Plus (yearly)' },
+    { '@type': 'Offer', price: APP.precios.mensualEUR, priceCurrency: 'EUR', name: 'Own Lane Plus (monthly)' },
   ],
 };
 ---

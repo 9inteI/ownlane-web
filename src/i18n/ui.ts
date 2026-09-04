@@ -29,6 +29,8 @@ export const ui = {
     'articulo.fuentes': 'Fuentes',
     'articulo.minutos': 'min de lectura',
     'articulo.actualizado': 'Actualizado',
+    'articulo.sigue': 'Sigue con',
+    'articulo.cta': 'Own Lane te pregunta cómo te has sentido después de cada salida y ajusta el plan. El plan entero hasta tu meta es gratis.',
   },
   en: {
     'nav.inicio': 'Home',
@@ -55,6 +57,8 @@ export const ui = {
     'articulo.fuentes': 'Sources',
     'articulo.minutos': 'min read',
     'articulo.actualizado': 'Updated',
+    'articulo.sigue': 'Keep reading',
+    'articulo.cta': 'Own Lane asks how each run felt and adjusts the plan. The whole plan to your goal is free.',
   },
 } as const;
 

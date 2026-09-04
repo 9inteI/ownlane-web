@@ -8,16 +8,22 @@
  * literal. Si mas adelante quieres el badge oficial, se descarga de Apple
  * Marketing Resources y se sustituye este componente por la imagen tal cual.
  */
-import { APP } from '../data/app';
+import { enlaceTienda } from '../data/app';
 import type { Idioma } from '../i18n/routes';
 
-interface Props { lang: Idioma; variante?: 'lleno' | 'suave' | 'inverso'; clase?: string; }
-const { lang, variante = 'lleno', clase = '' } = Astro.props;
+interface Props {
+  lang: Idioma;
+  variante?: 'lleno' | 'suave' | 'inverso';
+  clase?: string;
+  /** Canal de campana para App Store Connect. `web` salvo que se diga otro. */
+  ct?: string;
+}
+const { lang, variante = 'lleno', clase = '', ct = 'web' } = Astro.props;
 
 const texto = lang === 'es' ? 'Descárgalo en el App Store' : 'Download on the App Store';
 const sub = lang === 'es' ? 'Gratis · iPhone y Apple Watch' : 'Free · iPhone and Apple Watch';
 ---
-<a class:list={['pildora', variante, clase]} href={APP.appStoreUrl}>
+<a class:list={['pildora', variante, clase]} href={enlaceTienda(ct)}>
   <span class="texto">{texto}</span>
   <span class="sub">{sub}</span>
 </a>

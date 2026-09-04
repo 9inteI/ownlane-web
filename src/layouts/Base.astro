@@ -19,12 +19,17 @@ interface Props {
 
 const { titulo, descripcion, lang, pagina, alternas, og, tipo } = Astro.props;
 const alt = alternas ?? (pagina ? { ...rutas[pagina] } : { es: '/', en: '/en' });
+// El selector de idioma siempre necesita a donde ir (a la home si no hay
+// traduccion), pero el hreflang no: una pagina sin `pagina` ni `alternas` no
+// tiene version en el otro idioma, y declarar la home como su traduccion
+// seria mentirle a Google. Ver san-silvestre.astro.
+const altHead = alternas ?? (pagina ? alt : undefined);
 const tr = t(lang);
 ---
 <!doctype html>
 <html lang={lang}>
   <head>
-    <Head titulo={titulo} descripcion={descripcion} lang={lang} pagina={pagina} alternas={alt} og={og} tipo={tipo} />
+    <Head titulo={titulo} descripcion={descripcion} lang={lang} pagina={pagina} alternas={altHead} og={og} tipo={tipo} />
     <slot name="head" />
   </head>
   <body>

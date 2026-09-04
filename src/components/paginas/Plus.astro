@@ -21,8 +21,8 @@ const jsonld = {
   operatingSystem: 'iOS, watchOS',
   installUrl: APP.appStoreUrl,
   offers: [
-    { '@type': 'Offer', price: '49.00', priceCurrency: 'EUR', name: lang === 'es' ? 'Anual' : 'Yearly' },
-    { '@type': 'Offer', price: '4.99', priceCurrency: 'EUR', name: lang === 'es' ? 'Mensual' : 'Monthly' },
+    { '@type': 'Offer', price: APP.precios.anualEUR, priceCurrency: 'EUR', name: lang === 'es' ? 'Anual' : 'Yearly' },
+    { '@type': 'Offer', price: APP.precios.mensualEUR, priceCurrency: 'EUR', name: lang === 'es' ? 'Mensual' : 'Monthly' },
   ],
 };
 ---
@@ -83,7 +83,7 @@ const jsonld = {
   </section>
 
   <section class="cierre">
-    <div class="envoltorio centro"><AppStoreBadge lang={lang} /></div>
+    <div class="envoltorio centro"><AppStoreBadge lang={lang} ct="plus" /></div>
   </section>
 </Base>
 

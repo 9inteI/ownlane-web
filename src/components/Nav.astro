@@ -3,7 +3,7 @@ import { t } from '../i18n/ui';
 import { ruta, type Idioma } from '../i18n/routes';
 import LangSwitch from './LangSwitch.astro';
 import Glifo from './Glifo.astro';
-import { APP } from '../data/app';
+import { enlaceTienda } from '../data/app';
 
 interface Props { lang: Idioma; alternas: { es: string; en: string }; }
 const { lang, alternas } = Astro.props;
@@ -43,7 +43,7 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
         <LangSwitch lang={lang} alternas={alternas} />
       </div>
 
-      <a class="descarga" href={APP.appStoreUrl}>{tr('cta.appstore')}</a>
+      <a class="descarga" href={enlaceTienda('web')}>{tr('cta.appstore')}</a>
 
       {/* Solo movil. Sin JS no aparece y el plegable se queda desplegado. */}
       <button class="boton-menu" type="button" aria-controls="menu-nav" aria-expanded="false">
