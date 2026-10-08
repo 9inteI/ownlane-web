@@ -1,5 +1,8 @@
 /** Politica de privacidad. El espanol viene de OwnLane/docs/privacidad.html;
- *  el ingles esta traducido para la web. */
+ *  el ingles esta traducido para la web.
+ *
+ *  REVISION LEGAL (Elena, 08/10/2026): los marcadores [PENDIENTE ...] deben
+ *  rellenarse con los datos reales del titular ANTES de fusionar este PR. */
 export type Bloque =
   | { tipo: 'p'; texto: string }
   | { tipo: 'p-sutil'; texto: string }
@@ -22,11 +25,11 @@ export const politica: Record<'es' | 'en', {
 }> = {
   es: {
     titulo: 'Own Lane · Política de privacidad',
-    descripcion: 'Own Lane no recoge datos. No hay cuenta, ni servidor, ni analítica, ni seguimiento.',
+    descripcion: 'Own Lane no recoge tus datos en servidores propios. No hay cuenta, ni analítica, ni seguimiento.',
     h1: 'Política de privacidad',
-    fecha: 'Última actualización: 27 de agosto de 2026',
+    fecha: 'Última actualización: [PENDIENTE: fecha de publicación]',
     contactoTitulo: 'Contacto',
-    contactoTexto: 'Para cualquier duda sobre esta política:',
+    contactoTexto: 'Para cualquier duda sobre esta política o para ejercer tus derechos:',
     secciones: [
       {
         titulo: null,
@@ -34,11 +37,17 @@ export const politica: Record<'es' | 'en', {
           {
             tipo: 'tarjeta',
             parrafos: [
-              { texto: 'Own Lane no recoge nada.', fuerte: true },
-              { texto: 'No hay cuenta, no hay servidor, no hay analítica y no hay seguimiento publicitario. Todo lo que la app sabe de ti está en tu iPhone y no sale de ahí.' },
-              { texto: 'Esto no es una promesa vaga: la app no contiene ni una sola llamada de red.', sutil: true },
+              { texto: 'Own Lane no recoge tus datos.', fuerte: true },
+              { texto: 'No hay cuenta, no hay servidor propio, no hay analítica y no hay seguimiento publicitario. Todo lo que la app sabe de ti está en tu iPhone y no sale de ahí.' },
+              { texto: 'La única comunicación con servidores es la que hace el propio sistema con Apple para gestionar la suscripción (ver «Suscripción»). Own Lane no envía tus datos de entrenamiento, salud ni ubicación a ningún servidor.', sutil: true },
             ],
           },
+        ],
+      },
+      {
+        titulo: 'Responsable',
+        bloques: [
+          { tipo: 'p', texto: 'Responsable del tratamiento y titular de la app: [PENDIENTE: nombre y apellidos completos del titular], con NIF [PENDIENTE: NIF], domicilio en [PENDIENTE: dirección postal] y correo de contacto rbd.cysec@pm.me.' },
         ],
       },
       {
@@ -86,17 +95,17 @@ export const politica: Record<'es' | 'en', {
       {
         titulo: 'Suscripción',
         bloques: [
-          { tipo: 'p', texto: 'Las compras las gestiona Apple. Own Lane nunca ve tu método de pago, tu número de tarjeta ni tu identificador de Apple. Del sistema solo recibimos si tienes una suscripción activa o no.' },
+          { tipo: 'p', texto: 'Las compras las gestiona Apple a través del sistema (App Store), lo que implica comunicaciones entre tu dispositivo y Apple que Own Lane no controla y que se rigen por la política de privacidad de Apple. Own Lane nunca ve tu método de pago, tu número de tarjeta ni tu identificador de Apple. Del sistema solo recibimos si tienes una suscripción activa o no.' },
         ],
       },
       {
         titulo: 'Terceros',
-        bloques: [{ tipo: 'p', texto: 'Ninguno. La app no incluye SDK de analítica, de publicidad ni de seguimiento.' }],
+        bloques: [{ tipo: 'p', texto: 'La app no incluye SDK de analítica, de publicidad ni de seguimiento. El único tercero que interviene es Apple, para las compras y la suscripción.' }],
       },
       {
         titulo: 'Esta web',
         bloques: [
-          { tipo: 'p', texto: 'La web tampoco. No hay cookies, no hay analítica y no hay píxeles de seguimiento: no se carga ni un solo recurso de otro dominio. Por eso no verás un aviso de consentimiento — no habría nada que consentir.' },
+          { tipo: 'p', texto: 'Esta web no usa cookies, ni analítica, ni píxeles de seguimiento. Está alojada en [PENDIENTE: confirmar proveedor de alojamiento, p. ej. Vercel], que, como cualquier servidor web, puede registrar datos técnicos de la visita (dirección IP, fecha y hora, página solicitada) por motivos de seguridad y funcionamiento. Los enlaces a la App Store pueden incluir un identificador de campaña para saber desde qué página llegas; el seguimiento posterior lo realiza Apple, no esta web.' },
         ],
       },
       {
@@ -106,7 +115,7 @@ export const politica: Record<'es' | 'en', {
       {
         titulo: 'Tus derechos',
         bloques: [
-          { tipo: 'p', texto: 'El Reglamento General de Protección de Datos te reconoce derechos de acceso, rectificación y supresión sobre tus datos personales. En el caso de Own Lane esos derechos se ejercen solos: los datos están en tu dispositivo, los ves dentro de la app y los borras cuando quieras sin pedírnoslo. No conservamos ninguna copia.' },
+          { tipo: 'p', texto: 'El Reglamento General de Protección de Datos te reconoce derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad. En el caso de Own Lane esos derechos se ejercen en gran medida solos: los datos están en tu dispositivo, los ves dentro de la app y los borras cuando quieras. Si tienes dudas o quieres ejercerlos respecto a cualquier dato que pudiéramos tratar (por ejemplo, si nos escribes por correo), escríbenos al contacto indicado abajo. También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).' },
         ],
       },
       {
@@ -117,11 +126,11 @@ export const politica: Record<'es' | 'en', {
   },
   en: {
     titulo: 'Own Lane · Privacy policy',
-    descripcion: 'Own Lane collects no data. No account, no server, no analytics, no tracking.',
+    descripcion: 'Own Lane does not collect your data on its own servers. No account, no analytics, no tracking.',
     h1: 'Privacy policy',
-    fecha: 'Last updated: 27 August 2026',
+    fecha: 'Last updated: [PENDIENTE: publication date]',
     contactoTitulo: 'Contact',
-    contactoTexto: 'For any question about this policy:',
+    contactoTexto: 'For any question about this policy or to exercise your rights:',
     secciones: [
       {
         titulo: null,
@@ -129,11 +138,17 @@ export const politica: Record<'es' | 'en', {
           {
             tipo: 'tarjeta',
             parrafos: [
-              { texto: 'Own Lane collects nothing.', fuerte: true },
-              { texto: 'No account, no server, no analytics and no advertising tracking. Everything the app knows about you is on your iPhone and never leaves it.' },
-              { texto: "This is not a vague promise: the app doesn't contain a single network call.", sutil: true },
+              { texto: 'Own Lane does not collect your data.', fuerte: true },
+              { texto: 'No account, no server of our own, no analytics and no advertising tracking. Everything the app knows about you is on your iPhone and never leaves it.' },
+              { texto: 'The only communication with servers is the one your system itself has with Apple to manage the subscription (see “Subscription”). Own Lane does not send your training, health or location data to any server.', sutil: true },
             ],
           },
+        ],
+      },
+      {
+        titulo: 'Controller',
+        bloques: [
+          { tipo: 'p', texto: 'Data controller and app owner: [PENDIENTE: full name of the owner], tax ID [PENDIENTE: NIF], address [PENDIENTE: postal address], contact email rbd.cysec@pm.me.' },
         ],
       },
       {
@@ -181,17 +196,17 @@ export const politica: Record<'es' | 'en', {
       {
         titulo: 'Subscription',
         bloques: [
-          { tipo: 'p', texto: 'Purchases are handled by Apple. Own Lane never sees your payment method, your card number or your Apple Account. From the system we only receive whether you have an active subscription or not.' },
+          { tipo: 'p', texto: 'Purchases are handled by Apple through the system (App Store), which involves communications between your device and Apple that Own Lane does not control and that are governed by Apple’s privacy policy. Own Lane never sees your payment method, your card number or your Apple Account. From the system we only receive whether you have an active subscription or not.' },
         ],
       },
       {
         titulo: 'Third parties',
-        bloques: [{ tipo: 'p', texto: 'None. The app includes no analytics, advertising or tracking SDK.' }],
+        bloques: [{ tipo: 'p', texto: 'The app includes no analytics, advertising or tracking SDK. The only third party involved is Apple, for purchases and the subscription.' }],
       },
       {
         titulo: 'This website',
         bloques: [
-          { tipo: 'p', texto: 'Nor does the site. No cookies, no analytics and no tracking pixels: not a single resource is loaded from another domain. That is why you will not see a consent banner — there would be nothing to consent to.' },
+          { tipo: 'p', texto: 'This site uses no cookies, no analytics and no tracking pixels. It is hosted by [PENDIENTE: confirm hosting provider, e.g. Vercel], which, like any web server, may log technical visit data (IP address, date and time, requested page) for security and operation. Links to the App Store may include a campaign identifier to tell which page you came from; any later tracking is done by Apple, not by this site.' },
         ],
       },
       {
@@ -201,7 +216,7 @@ export const politica: Record<'es' | 'en', {
       {
         titulo: 'Your rights',
         bloques: [
-          { tipo: 'p', texto: 'The General Data Protection Regulation gives you rights of access, rectification and erasure over your personal data. With Own Lane those rights exercise themselves: the data is on your device, you see it inside the app and you delete it whenever you want without asking us. We keep no copy.' },
+          { tipo: 'p', texto: 'The General Data Protection Regulation gives you rights of access, rectification, erasure, objection, restriction and portability. With Own Lane those rights largely exercise themselves: the data is on your device, you see it inside the app and you delete it whenever you want. If you have questions or want to exercise them regarding any data we might process (for example, if you email us), write to the contact below. You may also lodge a complaint with the Spanish Data Protection Agency (aepd.es).' },
         ],
       },
       {
